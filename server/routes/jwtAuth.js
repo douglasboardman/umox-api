@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { password } = require("pg/lib/defaults");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
+const jwtGenerator = require("../utils/jwtGenerator");
 
 // registering
 
@@ -23,7 +24,6 @@ router.post("/register", async (req,res)=>{
 
         const saltRound = 10;
         const salt = await bcrypt.genSalt(saltRound);
-
         const bcryptSenha = await bcrypt.hash(senha, salt);
 
         // 4. inserir novo usuário na base de dados
@@ -33,9 +33,10 @@ router.post("/register", async (req,res)=>{
             [nome, email, bcryptSenha]
         );
 
-        res.json(novoUsuario.rows[0]);
-
         // 5. gerar token jwt
+
+        const token = jwtGenerator(novoUsuario.rows[0].id_usuario);
+        res.json({token});
 
     } catch (err) {
         console.error(err.message);

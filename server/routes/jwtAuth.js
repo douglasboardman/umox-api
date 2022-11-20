@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { password } = require("pg/lib/defaults");
+//const { password } = require("pg/lib/defaults");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 const jwtGenerator = require("../utils/jwtGenerator");

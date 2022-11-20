@@ -3,10 +3,12 @@ const router = require("express").Router();
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 const jwtGenerator = require("../utils/jwtGenerator");
+const validInfo = require("../middleware/validInfo");
+const authorization = require("../middleware/authorization");
 
 // router do form de registro de usuário
 
-router.post("/register", async (req,res)=>{
+router.post("/register", validInfo, async (req,res)=>{
     try {
         // 1. destructure do formulário de registro > req.body (nome, email, senha)
 
@@ -46,7 +48,7 @@ router.post("/register", async (req,res)=>{
 
 // router do form de login
 
-router.post("/login", async (req, res) => {
+router.post("/login", validInfo, async (req, res) => {
     try {
         // 1. destructure do formulário de login > req.body (email, senha)
         const { email, senha } = req.body;
@@ -80,7 +82,16 @@ router.post("/login", async (req, res) => {
         console.error(err.message);
         res.status(500).send("Erro no Servidor");
     }
-})
+});
+
+router.get("/is-verify", authorization, async (req, res) => {
+    try {
+        res.json(true);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Erro de servidor");
+    }
+});
 
 
 module.exports = router;

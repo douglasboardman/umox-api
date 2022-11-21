@@ -10,9 +10,13 @@ app.use(cors());
 
 //ROUTES//
 
-//register and login routes
+// routes de registro e login
 
 app.use("/auth", require("./routes/jwtAuth"));
+
+// route para dashboard
+
+app.use("/dashboard", require("./routes/dashboard"));
 
 app.listen(port, ()=>{
     console.log('Servidor rodando');

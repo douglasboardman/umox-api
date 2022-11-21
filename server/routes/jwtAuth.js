@@ -1,5 +1,4 @@
 const router = require("express").Router();
-//const { password } = require("pg/lib/defaults");
 const pool = require("../db");
 const bcrypt = require("bcrypt");
 const jwtGenerator = require("../utils/jwtGenerator");
@@ -50,10 +49,10 @@ router.post("/register", validInfo, async (req,res)=>{
 
 router.post("/login", validInfo, async (req, res) => {
     try {
-        // 1. destructure do formulário de login > req.body (email, senha)
+        // 1. destructure das informações do formulário de login > req.body (email, senha)
         const { email, senha } = req.body;
 
-        // 2. confere se o usuário não existe (se não existe dispara um erro)
+        // 2. confere se o usuário existe (se não existe dispara um erro)
         
         const usuario = await pool.query(
             "SELECT * FROM usuarios WHERE email_usuario = $1",

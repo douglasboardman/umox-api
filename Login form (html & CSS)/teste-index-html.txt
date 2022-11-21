@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/login.css">
+
+    <title>UMOX | Login</title>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title login">Umox Login</div>
+            <div class="title signup">Cadastro</div>
+        </div>
+        <div class="form-container">
+            <div class="slide-controls">
+                <input type="radio" name="slide" id="login" checked>
+                <input type="radio" name="slide" id="signup">
+                <label for="login" class="slide login">Login</label>
+                <label for="signup" class="slide signup">Cadastro</label>
+                <div class="slider-tab"></div>
+            </div>
+            <div class="form-inner">
+                <form method="post" class="login">
+                    <div class="field">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="senha" placeholder="Senha" required>
+                    </div>
+                    <div class="pass-link"><a href="#">Esqueceu sua senha?</a></div>
+                    <div class="field btn">
+                        <div class="btn-layer"></div>
+                        <input type="submit" value="Login">
+                    </div>
+                    <div class="signup-link">Não é cadastrado? <a href="">Cadastre-se</a></div>
+                </form>
+                <form method="post" class="signup">
+                    <div class="field">
+                        <input type="email" name="cad_email" placeholder="Email" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="cad_senha1" placeholder="Senha" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="cad_senha2" placeholder="Confirmar senha" required>
+                    </div>
+                    <div class="field btn">
+                        <div class="btn-layer"></div>
+                        <input type="submit" value="Signup">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/public/js/login.js"></script>
+</body>
+
+</html>

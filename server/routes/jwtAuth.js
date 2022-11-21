@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const pool = require("../db");
+const conn = require("../db");
 const bcrypt = require("bcrypt");
 const jwtGenerator = require("../utils/jwtGenerator");
 const validInfo = require("../middleware/validInfo");
-const authorization = require("../middleware/authorization");
+const autorizar = require("../middleware/authorization");
+require('dotenv').config();
 
 // router do form de registro de usuário
 
@@ -15,7 +16,7 @@ router.post("/register", validInfo, async (req,res)=>{
 
         // 2. verificar se o usuário existe (se o usuário existe, retornar erro)
 
-        const usuario = await pool.query("SELECT * FROM usuarios WHERE email_usuario = $1", [email]);
+        const usuario = await conn.query("SELECT * FROM usuarios WHERE email_usuario = $1", [email]);
 
         if(usuario.rows.length !== 0) {
             return res.status(401).send("Usuário já cadastrado!");
@@ -29,14 +30,14 @@ router.post("/register", validInfo, async (req,res)=>{
 
         // 4. inserir novo usuário na base de dados
 
-        const novoUsuario = await pool.query(
+        const novoUsuario = await conn.query(
             "INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario) VALUES ($1, $2, $3) RETURNING *",
             [nome, email, bcryptSenha]
         );
 
         // 5. atribuir token jwt
 
-        const token = jwtGenerator(novoUsuario.rows[0].id_usuario);
+        const token = jwtGenerator(novoUsuario.rows[0].id_usuario, process.env.permissoesPadrao);
         res.json({token});
 
     } catch (err) {
@@ -54,7 +55,7 @@ router.post("/login", validInfo, async (req, res) => {
 
         // 2. confere se o usuário existe (se não existe dispara um erro)
         
-        const usuario = await pool.query(
+        const usuario = await conn.query(
             "SELECT * FROM usuarios WHERE email_usuario = $1",
             [email]
         );
@@ -71,11 +72,19 @@ router.post("/login", validInfo, async (req, res) => {
             return res.status(401).json("Usuário ou senha incorretos");
         }
 
-        // 4. atribuir token jwt
+        // 4. consultar permissoes do usuario
 
-        const token = jwtGenerator(usuario.rows[0].id_usuario);
+        const permissoes = await conn.query("SELECT permissoes FROM perfis where perfil = $1", [usuario.rows[0].perfil_usuario]);
 
-        res.json({token});
+        // 5. atribuir token jwt
+
+        
+        if (!usuario.rows[0].acesso_permitido){
+            return res.status(401).json("Usuário não autorizado. Fale com o administrador");
+        }
+        
+        const token = jwtGenerator(usuario.rows[0].id_usuario, permissoes.rows[0].permissoes);
+        res.send({token});
 
     } catch (err) {
         console.error(err.message);
@@ -83,7 +92,7 @@ router.post("/login", validInfo, async (req, res) => {
     }
 });
 
-router.get("/is-verify", authorization, async (req, res) => {
+router.get("/is-verify", autorizar, async (req, res) => {
     try {
         res.json(true);
     } catch (err) {

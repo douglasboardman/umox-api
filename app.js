@@ -1,34 +1,29 @@
-const url = require('url');
-const fs = require('fs');
+const express = require('express');
+const app = express();
+const path = require('path');
+const cors = require("cors");
+const port = 3000;
 
-function renderHTML(path, res) {
-    
-    fs.readFile(path, null, (erro, dados) => {
-        if(erro) {
-            res.writeHead(404);
-            res.write('Página não encontrada!')
-        } else {
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write(dados);
-        }
-        res.end();
-    });
-}
+app.set("view engine", "ejs");
 
-module.exports = {
-    handleRequest: function(req, res) {
-        let path = url.parse(req.url).pathname;
-        switch (path) {
-            case '/': 
-                renderHTML('./client/views/index.html', res);
-                break;
-            case '/auth/login': 
-                renderHTML('./client/views/login.html', res);
-                break;
-            default:
-                res.writeHead(404);
-                res.write('Página não encontrada');
-                res.end();
-        }
-    }
-}
+//middleware
+
+app.use(express.json()); //req.body
+app.use(cors());
+
+//ROUTES//
+
+// routes de registro e login
+
+app.use("/", require("./routes/index"));
+
+app.use("/auth", require("./routes/jwtAuth"));
+
+// route para dashboard
+
+app.use("/dashboard", require("./routes/dashboard"));
+
+
+app.listen(port, ()=>{
+    console.log('Servidor rodando');
+});

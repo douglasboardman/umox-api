@@ -2,13 +2,13 @@
   "name": "umox",
   "version": "1.0.0",
   "description": "Aplicação de controle de estoque (Almoxarifado) do IFFar Campus Avançado Uruguaiana",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/douglasboardman/umox.git"
+    "url": "git+https://github.com/douglasboardman/umox_app.git"
   },
   "keywords": [
     "estoque",
@@ -17,9 +17,9 @@
   "author": "Douglas Boardman",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/douglasboardman/umox/issues"
+    "url": "https://github.com/douglasboardman/umox_app/issues"
   },
-  "homepage": "https://github.com/douglasboardman/umox#readme",
+  "homepage": "https://github.com/douglasboardman/umox_app#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",

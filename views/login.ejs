@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('./partials/header'); %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMOX</title>
-    <link rel="stylesheet" href="./css/styles.css">
-
-</head>
-<body>
     <div class="wrapper">
         <div class="title-text">
             <div class="title login">Umox Login</div>
@@ -24,7 +14,7 @@
                 <div class="slider-tab"></div>
             </div>
             <div class="form-inner">
-                <form method="post" class="login">
+                <form action="/auth/login" method="post" class="login">
                     <div class="field">
                         <input type="email" name="email" placeholder="Email" required>
                     </div>
@@ -38,25 +28,24 @@
                     </div>
                     <div class="signup-link">Não é cadastrado? <a href="">Cadastre-se</a></div>
                 </form>
-                <form method="post" class="signup">
+                <form action="/auth/register" method="post" class="signup">
                     <div class="field">
-                        <input type="email" name="cad_email" placeholder="Email" required>
+                        <input type="text" name="nome" placeholder="Nome" required>
                     </div>
                     <div class="field">
-                        <input type="password" name="cad_senha1" placeholder="Senha" required>
+                        <input type="email" name="email" placeholder="Email" required>
                     </div>
                     <div class="field">
-                        <input type="password" name="cad_senha2" placeholder="Confirmar senha" required>
+                        <input type="password" name="senha" placeholder="Senha" required>
                     </div>
                     <div class="field btn">
                         <div class="btn-layer"></div>
-                        <input type="submit" value="Signup">
+                        <input type="submit" value="Solicitar Cadastro">
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <script src="../public/js/login.js"></script>
-    </body>
+    <script src="/js/login.js"></script>
 
     <%- include('./partials/footer'); %>

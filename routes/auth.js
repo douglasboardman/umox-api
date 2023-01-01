@@ -23,13 +23,13 @@ router.post('/login', validaInfo, async (req, res)=>{
         const result = await usuario.carregarPorEmail(email);
         
         if(!result.status) {
-            return res.render('login', {msg: "Usuário ou senha incorretos"});
+            return res.send({message: "Usuário ou senha incorretos"});
         }
         // 3. checa se a senha informada é a mesma registrada no banco
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
         if(!senhaValida){
-            return res.render('login', {msg: "Usuário ou senha incorretos"});
+            return res.send({message: "Usuário ou senha incorretos"});
         }
         // 4. consulta autorização de acesso e permissões do usuario
         const acessoPermitido = usuario.acesso;

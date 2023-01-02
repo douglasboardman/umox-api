@@ -7,15 +7,15 @@ module.exports = (req, res, next) => {
 
     if (req.path === "/register") {
         if (![email, nome, senha].every(Boolean)) {
-            return res.status(401).json("Sem credenciais");
+            return res.status(403).json({message: "Usuário não possui credenciais"});
         } else if (!emailValido(email)) {
-            return res.status(401).json("Email inválido");
+            return res.status(400).json({message: "Email inválido"});
         }
     } else if (req.path === "/login") {
         if (![email, senha].every(Boolean)) {
-            return res.render('login', {erro: "Credenciais não informadas"});
+            return res.status(400).json({message: "Credenciais não informadas"});
         } else if (!emailValido(email)) {
-            return res.render('login', {erro: "Você inseriu um email inválido"});
+            return res.status(400).json({message: "Email inválido"});
         }
     }
     next();

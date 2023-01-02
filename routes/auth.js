@@ -23,30 +23,31 @@ router.post('/login', validaInfo, async (req, res)=>{
         const result = await usuario.carregarPorEmail(email);
         
         if(!result.status) {
-            return res.send({message: "Usuário ou senha incorretos"});
+            return res.status(401).json({message: "Usuário ou senha incorretos"});
         }
         // 3. checa se a senha informada é a mesma registrada no banco
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
         if(!senhaValida){
-            return res.send({message: "Usuário ou senha incorretos"});
+            return res.status(401).json({message: "Usuário ou senha incorretos"});
         }
         // 4. consulta autorização de acesso e permissões do usuario
         const acessoPermitido = usuario.acesso;
 
         if (!acessoPermitido){
-            return res.render('acessoNegado');
+            return res.status(403).json({message: 'Usuário não possui permissão para acessar o sistema'});
         }
 
         const permissoes = (await usuario.listarPermissoes()).dados;
         // 5. atribui token jwt
         const token = jwtGenerator(usuario.id, usuario.nome, permissoes);
         
-        res.cookie('jwtToken', token, { maxAge: 1 * 60 * 60 * 1000, httpOnly: true });
-        res.redirect('/home');
+        //res.cookie('jwtToken', token, { maxAge: 1 * 60 * 60 * 1000, httpOnly: true });
+        res.header('x-access-token', token);
+        res.status(200).json({message: 'Login realizado com sucesso!'});
     } catch (err) {
         console.log(err);
-        return res.render('acessoNegado');
+        return res.sendStatus(500);
     }
 
 });
@@ -69,32 +70,32 @@ router.post('/register', validaInfo, async (req, res)=>{
     
             // 4. cadastra novo usuario
             const result = await usuario.cadastrar(nome, email, bcryptSenha);
-            
-            return res.status(200).json(result);
+            if(result.status) {
+                return res.status(200).json({message: result.msg});
+            } else {
+                return res.status(400).json({message: result.msg});
+            }
         } else {
-            return res.status(500).json({status: false, msg: "Email já cadastrado"});
+            return res.status(401).json({message: "Email já cadastrado"});
         }
 
     } catch (erro) {
         console.log(erro);
-        return res.status(500).json({status: false, msg: erro});
+        return res.status(500).json({message: erro});
     }
 
 });
 
 
 // router para o dashboard
-router.get('/home', autorizar, async (req, res)=>{
+router.get('/dashboard', autorizar, async (req, res)=>{
     if(req.usuario){
-        return res.render(
-            'home', 
-            {
-                usuario: req.usuario.nome, 
-                tituloPagina: 'Home'
-            }
-        );
+        return res.status(200).json({
+            usuario: req.usuario.nome, 
+            tituloPagina: 'dashboard'
+        });
     } else {
-        return res.render('acessoNegado');
+        return res.status(403).json({message: 'Acesso não permitido'});
     }
 });
 
@@ -102,11 +103,11 @@ router.get('/home', autorizar, async (req, res)=>{
 
 router.get('/logout', (req, res)=>{
     try {
-        res.clearCookie('jwtToken');
+        res.header('x-access-token', '');
         req.usuario = {};
-        res.render('login', {title: 'Umox', logout: 'Logout realizado com sucesso!'});
+        res.json({message: 'Logout realizado com sucesso!'});
     } catch (erro) {
-        res.status(500).json(erro);
+        res.status(500).json({message: erro});
     }
 });
 

@@ -38,13 +38,16 @@ router.post('/login', validaInfo, async (req, res)=>{
             return res.status(403).json({message: 'Usuário não possui permissão para acessar o sistema'});
         }
 
+        // carrega payload
         const permissoes = (await usuario.listarPermissoes()).dados;
+        const payload = {id: usuario.id, nome: usuario.nome, permissoes: usuario.permissoes};
+
         // 5. atribui token jwt
         const token = jwtGenerator(usuario.id, usuario.nome, permissoes);
         
         //res.cookie('jwtToken', token, { maxAge: 1 * 60 * 60 * 1000, httpOnly: true });
         res.header('x-access-token', token);
-        res.status(200).json({message: 'Login realizado com sucesso!'});
+        res.status(200).send(payload);
     } catch (err) {
         console.log(err);
         return res.sendStatus(500);

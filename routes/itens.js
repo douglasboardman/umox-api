@@ -12,11 +12,9 @@ router.get('/consultarEstoque', autorizar, async (req, res)=>{
         const item = new Item;
         const result = await item.listarTodos();
         if(result.status){
-            return res.render(
-                'consultarEstoque', 
+            return res.status(200).send(
                 {
-                    usuario: req.usuario.nome, 
-                    tituloPagina: 'Consultar Estoque',
+                    usuario: req.usuario.nome,
                     breadcrumbs: setBreadcrumbs('Consultar estoque'), 
                     listaItens: result.dados
                 }
@@ -25,7 +23,7 @@ router.get('/consultarEstoque', autorizar, async (req, res)=>{
             return res.status(500).json(result.msg);
         }
     } else {
-        return res.render('acessoNegado');
+        return res.status(401).json({message: 'Acesso negado!'});
     }
 });
 

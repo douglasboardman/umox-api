@@ -60,7 +60,7 @@ router.post('/novoPedido', autorizar, async (req, res)=> {
         
             // lança itens do pedido no banco
             itens.forEach(async item => {
-                await itemPedido.criarNovo(item.id, idPedido, item.qtd);
+                await itemPedido.criarNovo(item.idItem, idPedido, item.qtdItem);
             });
             
             return res.status(200).json({status: true, msg: "Pedido criado com sucesso!"});

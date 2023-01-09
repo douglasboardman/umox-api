@@ -1,5 +1,5 @@
 const conn = require("../dbConnPool");
-const { dateToBD } = require("../utils/comum");
+const { dateToBD, dateToView } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
 
 
@@ -43,7 +43,42 @@ class Pedido {
             );
 
             if (typeof db_result.rows[0] != 'undefined') {
-                return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: db_result.rows};
+                let dados = db_result.rows.reduce((acc, curr) => {
+                    const pedido = acc.find(p => p.id_pedido === curr.id_pedido);
+                    if (pedido) {
+                        pedido.itens.push({
+                            id_item: curr.id_item,
+                            descricao_item: curr.descricao_item,
+                            marca_item: curr.marca_item,
+                            un_medida_item: curr.un_medida_item,
+                            estoque_item: curr.estoque_item,
+                            qtd_solicitada: curr.qtd_solicitada,
+                            qtd_atendida: curr.qtd_atendida
+                        });
+                    } else {
+                        acc.push({
+                            id_pedido: curr.id_pedido,
+                            finalidade_pedido: curr.finalidade_pedido,
+                            data_pedido: dateToView(curr.data_pedido),
+                            data_atendimento: curr.data_atendimento ? dateToView(curr.data_atendimento) : '-',
+                            status_pedido: curr.status_pedido,
+                            itens: [
+                                {
+                                    id_item: curr.id_item,
+                                    descricao_item: curr.descricao_item,
+                                    marca_item: curr.marca_item,
+                                    un_medida_item: curr.un_medida_item,
+                                    estoque_item: curr.estoque_item,
+                                    qtd_solicitada: curr.qtd_solicitada,
+                                    qtd_atendida: curr.qtd_atendida
+                                }
+                            ]
+                        })
+                    }
+                    return acc;
+                }, []);
+
+                return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: dados};
             } else {
                 return {status: false, msg: 'Erro ao realizar a consulta no Banco', dados: []};
             }

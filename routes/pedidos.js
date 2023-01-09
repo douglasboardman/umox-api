@@ -5,31 +5,9 @@ const Item = require('../classes/item');
 const Pedido = require('../classes/pedido');
 const { dateToView, setBreadcrumbs } = require('../utils/comum');
 const ItemPedido = require('../classes/item_pedido');
+const ResponseData = require('../classes/ResponseData');
 
 // router de novo pedido
-
-router.get('/novoPedido', autorizar, async (req, res)=>{
-    let permissoes = req.usuario.permissoes;                                                  
-    if (permissoes.fazer_pedidos) {                                                           
-        const item = new Item;                                                            
-        const result = await item.listarTodos();
-        if(result.status){
-            res.render(                                                                           
-                'cadastrarPedido',                                                                    
-                {
-                    usuario: req.usuario.nome, 
-                    tituloPagina: 'Novo Pedido',
-                    breadcrumbs: setBreadcrumbs('Cadastrar Pedido'),
-                    listaItens: result.dados
-                }  
-            );
-        } else {
-            res.status(500).json(result.msg);
-        }                                                                                
-    } else {
-        res.render('acessoNegado');
-    }
-});
 
 router.post('/novoPedido', autorizar, async (req, res)=> {
     
@@ -39,8 +17,9 @@ router.post('/novoPedido', autorizar, async (req, res)=> {
     // coleta finalidade do pedido
     const finalidade = req.body.finalidade;
 
-    // coleta id do usuario
+    // coleta dados do usuario
     const idUsuario = req.usuario.id;
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
 
     // cria instância da classe Pedidos
     const pedido = new Pedido;
@@ -62,38 +41,45 @@ router.post('/novoPedido', autorizar, async (req, res)=> {
             itens.forEach(async item => {
                 await itemPedido.criarNovo(item.idItem, idPedido, item.qtdItem);
             });
+            const response = new ResponseData(dadosUsuario, [], 'Pedido criado com sucesso!', false);
             
-            return res.status(200).json({status: true, msg: "Pedido criado com sucesso!"});
+            return res.status(200).json(response);
         }
 
     } catch (erro) {
-        console.log(erro);
-        return res.status(500).json({status: false, msg: "Erro ao criar novo pedido"});
+        const response = new ResponseData();
+        response.error(true);
+        response.userInfo(dadosUsuario);
+        response.message('Erro ao criar novo pedido');
+        return res.status(500).send(response);
     }
 
 });
 
 router.get('/meusPedidos', autorizar, async (req, res)=>{
     let permissoes = req.usuario.permissoes;                                                   
-    if (permissoes.fazer_pedidos) {                                                            
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
+
+    if (permissoes.fazer_pedidos) {
         const pedido = new Pedido;                                                              
-        const result = await pedido.pedidosDoUsuario(req.usuario.id);                            
+        const result = await pedido.pedidosDoUsuario(req.usuario.id);
+        const response = new ResponseData(
+            dadosUsuario,
+            result.dados,
+            result.msg,
+            !result.status
+        )
         if(result.status) {
-            res.render(
-                'meusPedidos', 
-                {
-                    usuario: req.usuario.nome, 
-                    tituloPagina: 'Meus Pedidos',
-                    breadcrumbs: setBreadcrumbs('Meus Pedidos'), 
-                    listaItensPedido: result.dados, 
-                    dateToView: dateToView
-                }
-            );
+            res.status(200).send(response);
         } else {
-            res.status(500).json(result.msg);
+            res.status(500).send(response);
         }
     } else {
-        res.render('acessoNegado');
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 

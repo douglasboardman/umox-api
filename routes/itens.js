@@ -3,27 +3,33 @@ const router = express.Router();
 const autorizar = require('../middlewares/autorizador');
 const Item = require('../classes/item');
 const { setBreadcrumbs } = require('../utils/comum');
+const ResponseData = require('../classes/ResponseData');
 
 
 // GET renderiza página de consulta de itens
 router.get('/consultarEstoque', autorizar, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_estoque){
         const item = new Item;
         const result = await item.listarTodos();
+        const response = new ResponseData(
+            dadosUsuario,
+            result.dados,
+            result.msg,
+            !result.status
+        );
         if(result.status){
-            return res.status(200).send(
-                {
-                    usuario: req.usuario.nome,
-                    breadcrumbs: setBreadcrumbs('Consultar estoque'), 
-                    listaItens: result.dados
-                }
-            );
+            return res.status(200).send(response);
         } else {
-            return res.status(500).json(result.msg);
+            return res.status(500).send(response);
         }
     } else {
-        return res.status(401).json({message: 'Acesso negado!'});
+        const response = new ResponseData()
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não tem permissão para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 

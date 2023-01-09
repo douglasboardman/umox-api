@@ -1,5 +1,5 @@
 const conn = require("../dbConnPool");
-const { Left, Right, dateToBD } = require("../utils/comum");
+const { dateToBD } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
 
 
@@ -31,7 +31,7 @@ class Pedido {
             }
         } catch (erro) {
             console.log(erro);
-            return {status: false, msg: erro};
+            return {status: false, msg: erro, dados: []};
         }
     }
 
@@ -45,11 +45,11 @@ class Pedido {
             if (typeof db_result.rows[0] != 'undefined') {
                 return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: db_result.rows};
             } else {
-                return {status: false, msg: 'Erro ao realizar a consulta no Banco'};
+                return {status: false, msg: 'Erro ao realizar a consulta no Banco', dados: []};
             }
         } catch (erro) {
             console.log(erro);
-            return {status: false, msg: erro};
+            return {status: false, msg: erro, dados: []};
         }
     }
 
@@ -63,7 +63,7 @@ class Pedido {
             
         } catch (erro) {
             console.log(erro);
-            return {status: false, msg: erro};
+            return {status: false, msg: erro, dados: []};
         }
     }
 
@@ -77,7 +77,7 @@ class Pedido {
             
         } catch (erro) {
             console.log(erro);
-            return {status: false, msg: erro};
+            return {status: false, msg: erro, dados: []};
         }
     }
 
@@ -95,11 +95,11 @@ class Pedido {
                 });
             }
             
-            return {status: true, msg: 'Pedido finalizado com sucesso!'};
+            return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};
 
         } catch(erro) {
             console.log(erro);
-            return {status: false, msg: erro};
+            return {status: false, msg: erro, dados: []};
         }
     }
 

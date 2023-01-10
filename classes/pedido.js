@@ -43,42 +43,9 @@ class Pedido {
             );
 
             if (typeof db_result.rows[0] != 'undefined') {
-                let dados = db_result.rows.reduce((acc, curr) => {
-                    const pedido = acc.find(p => p.id_pedido === curr.id_pedido);
-                    if (pedido) {
-                        pedido.itens.push({
-                            id_item: curr.id_item,
-                            descricao_item: curr.descricao_item,
-                            marca_item: curr.marca_item,
-                            un_medida_item: curr.un_medida_item,
-                            estoque_item: curr.estoque_item,
-                            qtd_solicitada: curr.qtd_solicitada,
-                            qtd_atendida: curr.qtd_atendida
-                        });
-                    } else {
-                        acc.push({
-                            id_pedido: curr.id_pedido,
-                            finalidade_pedido: curr.finalidade_pedido,
-                            data_pedido: dateToView(curr.data_pedido),
-                            data_atendimento: curr.data_atendimento ? dateToView(curr.data_atendimento) : '-',
-                            status_pedido: curr.status_pedido,
-                            itens: [
-                                {
-                                    id_item: curr.id_item,
-                                    descricao_item: curr.descricao_item,
-                                    marca_item: curr.marca_item,
-                                    un_medida_item: curr.un_medida_item,
-                                    estoque_item: curr.estoque_item,
-                                    qtd_solicitada: curr.qtd_solicitada,
-                                    qtd_atendida: curr.qtd_atendida
-                                }
-                            ]
-                        })
-                    }
-                    return acc;
-                }, []);
+                const dados = this.#reduzirLista(db_result.rows);
 
-                return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: dados};
+                return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};
             } else {
                 return {status: false, msg: 'Erro ao realizar a consulta no Banco', dados: []};
             }
@@ -93,8 +60,10 @@ class Pedido {
             const db_result = await conn.query(
                 'SELECT * FROM view_itens_pedido'
             );
+
+            const dados = this.#reduzirLista(db_result.rows);
             
-            return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: db_result.rows};
+            return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};
             
         } catch (erro) {
             console.log(erro);
@@ -136,6 +105,47 @@ class Pedido {
             console.log(erro);
             return {status: false, msg: erro, dados: []};
         }
+    }
+
+    #reduzirLista(result) {
+
+        let dados = result.reduce((acc, curr) => {
+            const pedido = acc.find(p => p.id_pedido === curr.id_pedido);
+            if (pedido) {
+                pedido.itens.push({
+                    id_item: curr.id_item,
+                    descricao_item: curr.descricao_item,
+                    marca_item: curr.marca_item,
+                    un_medida_item: curr.un_medida_item,
+                    estoque_item: curr.estoque_item,
+                    qtd_solicitada: curr.qtd_solicitada,
+                    qtd_atendida: curr.qtd_atendida
+                });
+            } else {
+                acc.push({
+                    id_pedido: curr.id_pedido,
+                    nome_usuario: curr.nome_usuario,
+                    finalidade_pedido: curr.finalidade_pedido,
+                    data_pedido: dateToView(curr.data_pedido),
+                    data_atendimento: curr.data_atendimento ? dateToView(curr.data_atendimento) : '-',
+                    status_pedido: curr.status_pedido,
+                    itens: [
+                        {
+                            id_item: curr.id_item,
+                            descricao_item: curr.descricao_item,
+                            marca_item: curr.marca_item,
+                            un_medida_item: curr.un_medida_item,
+                            estoque_item: curr.estoque_item,
+                            qtd_solicitada: curr.qtd_solicitada,
+                            qtd_atendida: curr.qtd_atendida
+                        }
+                    ]
+                })
+            }
+            return acc;
+        }, []);
+
+        return dados;
     }
 
 }

@@ -44,7 +44,6 @@ class Pedido {
 
             if (typeof db_result.rows[0] != 'undefined') {
                 const dados = this.#reduzirLista(db_result.rows);
-
                 return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};
             } else {
                 return {status: false, msg: 'Erro ao realizar a consulta no Banco', dados: []};
@@ -61,7 +60,7 @@ class Pedido {
                 'SELECT * FROM view_itens_pedido'
             );
 
-            const dados = this.#reduzirLista(db_result.rows);
+            const dados = {data: db_result.rows, reduced_data: this.#reduzirLista(db_result.rows)}
             
             return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};
             

@@ -75,8 +75,9 @@ class Pedido {
             const db_result = await conn.query(
                 "SELECT * FROM view_itens_pedido WHERE status_pedido = 'AGUARDANDO ATENDIMENTO'"
             );
+            const dados = this.#reduzirLista(db_result.rows);
 
-            return {status: true, msg: `A consulta retornou ${db_result.rows.length} linhas`, dados: db_result.rows};
+            return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};
             
         } catch (erro) {
             console.log(erro);

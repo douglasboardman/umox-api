@@ -135,28 +135,30 @@ router.get('/atendimento', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/atenderPedido', autorizar, async (req, res)=>{
+router.get('/atenderPedido/:pid', autorizar, async (req, res)=>{
     let permissoes = req.usuario.permissoes;
-    let idPedido = req.query['pid'];
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
+    let idPedido = req.params.pid;
     if (permissoes.atender_pedidos && idPedido) {
         const itemPedido = new ItemPedido;
         const result = await itemPedido.listarPorPedido(idPedido);
-        if(result.status) {
-            res.render(
-                'atenderPedido', 
-                {
-                    usuario: req.usuario.nome, 
-                    tituloPagina: 'Atender Pedido',
-                    breadcrumbs: setBreadcrumbs('Atender Pedido'),
-                    dados: result.dados, 
-                    dateToView: dateToView
-                }
-            );
+        const response = new ResponseData(
+            dadosUsuario,
+            result.dados,
+            result.msg,
+            !result.status
+        )
+        if(result.status){
+            res.status(200).send(response);
         } else {
-            res.status(500).json(result.msg);
+            res.status(500).send(response);
         }
     } else {
-        res.render('acessoNegado');
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 

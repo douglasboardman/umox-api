@@ -112,7 +112,7 @@ class Pedido {
         const data = new Date();
         const ano = String(data.getFullYear());
         const db_result = await conn.query('SELECT id_pedido FROM pedidos ORDER BY id_pedido DESC');
-        console.log(db_result.rows[0]);
+
         if(typeof db_result.rows[0] != 'undefined') {
             const lastId = String(db_result.rows[0].id_pedido);
             if(Left(lastId, 4) == ano){

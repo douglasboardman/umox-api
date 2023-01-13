@@ -1,5 +1,5 @@
 const conn = require("../dbConnPool");
-const { dateToBD, dateToView } = require("../utils/comum");
+const { dateToBD, dateToView, Left } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
 
 
@@ -15,9 +15,10 @@ class Pedido {
 
     async criarNovo(idUsuario, dtPedido, finalidade) {
         try {
+            let novaId = await this.gerarId();
             const db_result = await conn.query(
-                'INSERT INTO pedidos (id_usuario, data_pedido, finalidade_pedido) VALUES ($1, $2, $3) RETURNING *',
-                [idUsuario, dateToBD(dtPedido), finalidade]
+                'INSERT INTO pedidos (id_pedido, id_usuario, data_pedido, finalidade_pedido) VALUES ($1, $2, $3, $4) RETURNING *',
+                [novaId, idUsuario, dateToBD(dtPedido), finalidade]
             );
 
             if (typeof db_result.rows[0] != 'undefined') {
@@ -104,6 +105,23 @@ class Pedido {
         } catch(erro) {
             console.log(erro);
             return {status: false, msg: erro, dados: []};
+        }
+    }
+
+    async gerarId() {
+        const data = new Date();
+        const ano = String(data.getFullYear());
+        const db_result = await conn.query('SELECT id_pedido FROM pedidos ORDER BY id_pedido DESC');
+        console.log(db_result.rows[0]);
+        if(typeof db_result.rows[0] != 'undefined') {
+            const lastId = String(db_result.rows[0].id_pedido);
+            if(Left(lastId, 4) == ano){
+                return parseInt(db_result.rows[0].id_pedido) + 1;
+            } else {
+                return parseInt(ano + '001');
+            }
+        } else {
+            return parseInt(ano + '001');
         }
     }
 

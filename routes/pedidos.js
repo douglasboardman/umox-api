@@ -163,9 +163,10 @@ router.get('/atenderPedido/:pid', autorizar, async (req, res)=>{
 });
 
 router.post('/atenderPedido', autorizar, async (req, res)=>{
-    
-    // coleta permissões do usuário
+
+    // coleta dados do usuário
     const permissoes = req.usuario.permissoes;
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
 
     // cria data atendimento
     const dataAtendimento = new Date();
@@ -181,14 +182,23 @@ router.post('/atenderPedido', autorizar, async (req, res)=>{
     
     if(permissoes.atender_pedidos) {
         let result = await pedido.finalizarPedido(idPedido, observacao, statusPedido, dataAtendimento, objItens);
+        const response = new ResponseData(
+            dadosUsuario,
+            result.dados,
+            result.msg,
+            !result.status
+        )
         if(result.status) {
-            return res.status(200).json(result);
+            return res.status(200).send(response);
         } else {
-            console.log(result);
-            return res.status(500).json(result);
+            return res.status(500).json(response);
         }
     } else {
-        res.render('acessoNegado');
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 
 });

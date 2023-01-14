@@ -90,25 +90,33 @@ router.get('/estoque', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/editarItem', autorizar, async (req, res)=>{
+router.get('/editarItem/:id', autorizar, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
-    const idItem = req.query['idItem'];
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
+    const idItem = req.params.id;
     if(permissoes.gerenciar_estoque){
         const item = new Item;
-        const result = (await item.carregarPorId(idItem)).dados;
+        const result = (await item.carregarPorId(idItem));
         const naturezas = (await item.listarNaturezas()).dados;
-        return res.render(
-            'editarItem',
-            {
-                usuario: req.usuario.nome,
-                tituloPagina: 'Editar Item',
-                breadcrumbs: setBreadcrumbs('Editar item'), 
-                dados: result,
-                listaNaturezas: naturezas
-            }
-        );
+        const response = new ResponseData(
+            dadosUsuario,
+            {dadosItem: result.dados, listaNaturezas: naturezas},
+            result.msg,
+            !result.status
+        )
+        console.log(response);
+        if(result.status) {
+            return res.status(200).send(response);
+        } else {
+            return res.status(500).send(response);
+        }
+        
     } else {
-        return res.render('acessoNegado');
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 

@@ -113,12 +113,13 @@ class Item {
 
     async atualizarRegistro(id, descricao, idNatureza, marca, unMedida, estoque) {
         // confere alteração da natureza
+        
         try {
             if (Left(String(id), 4) == idNatureza) {
             
                 const db_result = await conn.query(
-                    'UPDATE itens SET descricao_item = $1, marca_item = $2, un_medida_item = $3, estoque_item = $4 RETURNING *',
-                    [descricao, marca, unMedida, estoque]
+                    'UPDATE itens SET descricao_item = $1, marca_item = $2, un_medida_item = $3, estoque_item = $4 WHERE id_item = $5 RETURNING *',
+                    [descricao, marca, unMedida, estoque, id]
                 );
     
                 if (typeof db_result.rows[0] != 'undefined') {

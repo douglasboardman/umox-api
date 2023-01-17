@@ -3,43 +3,53 @@ const router = express.Router();
 const autorizar = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
 const { setBreadcrumbs } = require('../utils/comum');
+const ResponseData = require('../classes/ResponseData');
 
 
 router.get('', autorizar, async (req, res) => {
     const permissoes = req.usuario.permissoes;
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_usuarios) {
         const usuario = new Usuario;
-        const listaUsuarios = (await usuario.listarTodos()).dados;
-        res.render(
-            'usuarios', 
-            {
-                usuario: req.usuario.nome, 
-                tituloPagina: 'Gerenciar Usuários',
-                breadcrumbs: setBreadcrumbs('Usuários'),
-                dados: listaUsuarios
-            }
-        );
+        const result = (await usuario.listarTodos());
+        const response = new ResponseData(
+            dadosUsuario,
+            result.dados,
+            result.msg,
+            !result.status
+        )
+        return res.status(200).send(response);
+    } else {
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 
 
-router.get('/editarUsuario', autorizar, async (req, res) => {
+router.get('/editarUsuario/:uid', autorizar, async (req, res) => {
+    const idUsuario = req.params.uid;
     const permissoes = req.usuario.permissoes;
-    const idUsuario = req.query['uid'];
+    const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_usuarios) {
         const usuario = new Usuario;
-        const dadosUsuario = (await usuario.carregarPorId(idUsuario)).dados;
+        const result = (await usuario.carregarPorId(idUsuario));
         const listaPerfis = (await usuario.listarPerfis()).dados;
-        res.render(
-            'editarUsuario', 
-            {
-                usuario: req.usuario.nome, 
-                tituloPagina: 'Editar Usuário',
-                breadcrumbs: setBreadcrumbs('Editar usuário'),
-                dados: dadosUsuario,
-                listaPerfis: listaPerfis
-            }
-        );
+        const response = new ResponseData(
+            dadosUsuario,
+            {dadosUsuario: result.dados, perfis: listaPerfis},
+            result.msg,
+            !result.status
+        )
+        return res.status(200).send(response);
+    } else {
+        const response = new ResponseData;
+        response.userInfo(dadosUsuario);
+        response.error(true);
+        response.message('Usuário não possui permissões para realizar esta ação.')
+        return res.status(401).send(response);
     }
 });
 

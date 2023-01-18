@@ -1,7 +1,8 @@
 const conn = require("../dbConnPool");
 const { dateToBD, dateToView, Left } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
-
+const Usuario = require('../classes/usuario');
+const Mailer = require('./mailer');
 
 class Pedido {
     constructor(idPedido, idUsuario, dtPedido, dtAtendimento, finalidade, status) {
@@ -93,13 +94,27 @@ class Pedido {
                 [status_pedido, observacao_atendimento, dateToBD(data_atendimento), id_pedido]
             );
             
+            let idUsuarioPedido = db_result.rows[0].id_usuario;
+            
             if(typeof db_result.rows[0] != 'undefined') {
                 let item = new ItemPedido;
                 objItens.forEach(async i => {
                     await item.atendimentoItemPedido(i.id_item, id_pedido, i.qtd_atendida);
                 });
             }
+
+            let usuario = new Usuario();
+            await usuario.carregarPorId(idUsuarioPedido);
+            let emailUsuarioPedido = await usuario.email;
             
+            const mailer = new Mailer(
+                `Pedido de material nº ${id_pedido}`,
+                emailUsuarioPedido,
+                `<h1>UMOX</h1><p>Seu pedido de material nº ${id_pedido} foi finalizado pelo atendente com o status de ${status_pedido}</p>`
+            );
+
+            mailer.sendEmail();
+
             return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};
 
         } catch(erro) {

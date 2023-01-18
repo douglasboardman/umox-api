@@ -1,6 +1,6 @@
 const conn = require("../dbConnPool");
 const { Left } = require("../utils/comum");
-require("../utils/comum");
+require("../utils/comum").default;
 
 class Item {
     constructor(id, descricao, idNatureza, marca, unMedida, estoque, natureza) {

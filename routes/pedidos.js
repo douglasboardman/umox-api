@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const autorizar = require('../middlewares/autorizador');
-const Item = require('../classes/item');
 const Pedido = require('../classes/pedido');
-const { dateToView, setBreadcrumbs } = require('../utils/comum');
 const ItemPedido = require('../classes/item_pedido');
 const ResponseData = require('../classes/ResponseData');
 

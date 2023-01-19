@@ -1,17 +1,39 @@
 const conn = require("../dbConnPool");
 const { dateToBD, dateToView, Left } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
-const Usuario = require('../classes/usuario');
-const Mailer = require('./mailer');
+const { MensagemPedidoFinalizado } = require("./mailer");
 
 class Pedido {
-    constructor(idPedido, idUsuario, dtPedido, dtAtendimento, finalidade, status) {
+    constructor(idPedido, idUsuario, dtPedido, dtAtendimento, finalidade, status, observacaoAtendimento) {
         this.idPedido = idPedido;
         this.idUsuario = idUsuario;
         this.dtPedido = dtPedido;
         this.dtAtendimento = dtAtendimento;
         this.finalidade = finalidade;
         this.status = status;
+        this.observacaoAtendimento = observacaoAtendimento;
+    }
+
+    async carregarPorId(idPedido) {
+        try {
+            const db_result = await conn.query(
+                'SELECT * FROM pedidos WHERE id_pedido = $1',
+                [idPedido]
+            );
+
+            if (typeof db_result.rows[0] != 'undefined') {
+                this.idPedido = idPedido;
+                this.idUsuario = db_result.rows[0].id_usuario;
+                this.dtPedido = db_result.rows[0].data_pedido;
+                this.dtAtendimento = db_result.rows[0].data_atendimento;
+                this.finalidade = db_result.rows[0].finalidade_pedido;
+                this.status = db_result.rows[0].status_pedido;
+                this.observacaoAtendimento = db_result.rows[0].observacao_atendimento;
+            }
+
+        } catch(error) {
+            console.log(error);
+        }
     }
 
     async criarNovo(idUsuario, dtPedido, finalidade) {
@@ -27,7 +49,7 @@ class Pedido {
                 this.idUsuario = db_result.rows[0].id_usuario;
                 this.dtPedido = db_result.rows[0].data_pedido;
                 this.dtAtendimento = db_result.rows[0].data_atendimento;
-                this.descricao = db_result.rows[0].finalidade_pedido;
+                this.finalidade = db_result.rows[0].finalidade_pedido;
                 this.status = db_result.rows[0].status_pedido;
                 return {status: true, msg: 'Pedido criado com sucesso!', dados: db_result.rows[0]};
             }
@@ -94,26 +116,17 @@ class Pedido {
                 [status_pedido, observacao_atendimento, dateToBD(data_atendimento), id_pedido]
             );
             
-            let idUsuarioPedido = db_result.rows[0].id_usuario;
-            
             if(typeof db_result.rows[0] != 'undefined') {
                 let item = new ItemPedido;
                 objItens.forEach(async i => {
                     await item.atendimentoItemPedido(i.id_item, id_pedido, i.qtd_atendida);
                 });
             }
-
-            let usuario = new Usuario();
-            await usuario.carregarPorId(idUsuarioPedido);
-            let emailUsuarioPedido = await usuario.email;
             
-            const mailer = new Mailer(
-                `Pedido de material nº ${id_pedido}`,
-                emailUsuarioPedido,
-                `<h1>UMOX</h1><p>Seu pedido de material nº ${id_pedido} foi finalizado pelo atendente com o status de ${status_pedido}</p>`
-            );
-
-            mailer.sendEmail();
+            const pedido = this;
+            await pedido.carregarPorId(id_pedido);
+            let message = new MensagemPedidoFinalizado(pedido);
+            await message.enviar();
 
             return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};
 

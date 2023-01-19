@@ -1,5 +1,4 @@
 const conn = require("../dbConnPool");
-const { Left, Right, dateToBD } = require("../utils/comum");
 const Item = require("./item");
 
 class ItemPedido {
@@ -54,7 +53,7 @@ class ItemPedido {
         }
     }
 
-    async listarPorPedido (id_pedido) {
+    async listarPorPedido(id_pedido) {
         try {
             const db_result = await conn.query(
                 'SELECT * FROM view_itens_pedido WHERE id_pedido = $1',

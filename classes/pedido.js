@@ -111,29 +111,34 @@ class Pedido {
 
     async finalizarPedido(id_pedido, observacao_atendimento, status_pedido, data_atendimento, objItens) {
         try {
-            const db_result = await conn.query(
-                "UPDATE pedidos SET status_pedido = $1, observacao_atendimento = $2, data_atendimento = $3 WHERE id_pedido = $4 RETURNING *",
-                [status_pedido, observacao_atendimento, dateToBD(data_atendimento), id_pedido]
-            );
-            
-            if(typeof db_result.rows[0] != 'undefined') {
-                let item = new ItemPedido;
-                objItens.forEach(async i => {
-                    await item.atendimentoItemPedido(i.id_item, id_pedido, i.qtd_atendida);
-                });
-            }
-            
-            const pedido = this;
-            await pedido.carregarPorId(id_pedido);
-            let message = new MensagemPedidoFinalizado(pedido);
-            await message.enviar();
+                const db_result = await conn.query(
+                    "UPDATE pedidos SET status_pedido = $1, observacao_atendimento = $2, data_atendimento = $3 WHERE id_pedido = $4 RETURNING *",
+                    [status_pedido, observacao_atendimento, dateToBD(data_atendimento), id_pedido]
+                );
+                
+                if(typeof db_result.rows[0] != 'undefined') {
+                    let item = new ItemPedido;
+                    const promises = objItens.map(async i => {
+                        await item.atendimentoItemPedido(i.id_item, id_pedido, i.qtd_atendida);
+                    });
+                    await Promise.all(promises);
+                    const pedido = this;
+                    await pedido.carregarPorId(id_pedido);
+                    let message = new MensagemPedidoFinalizado(pedido);
+                    await message.enviar();
+                };
 
-            return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};
+                return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};
 
-        } catch(erro) {
+            } catch(erro) {
+
             console.log(erro);
             return {status: false, msg: erro, dados: []};
         }
+    }
+
+    async atualizarItensAtendimento(objItens, idPedido) {
+        
     }
 
     async gerarId() {

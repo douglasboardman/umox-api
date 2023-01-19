@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
 
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", "http://192.168.10.100:4200"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
 
@@ -34,4 +34,4 @@ app.use('/admin/pedidos', pedidos);
 app.use('/admin/itens', itens);
 app.use('/admin/usuarios', usuarios);
 
-app.listen(port, ()=>{console.log("Listening to the server on http://localhost:3000")});
+app.listen(port, ()=>{console.log("Listening to the server on http://192.168.10.100:4200")});

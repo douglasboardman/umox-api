@@ -180,6 +180,7 @@ router.post('/atenderPedido', autorizar, async (req, res)=>{
     
     if(permissoes.atender_pedidos) {
         let result = await pedido.finalizarPedido(idPedido, observacao, statusPedido, dataAtendimento, objItens);
+        console.log(result);
         const response = new ResponseData(
             dadosUsuario,
             result.dados,

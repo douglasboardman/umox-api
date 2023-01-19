@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer');
+var inLineCss = require('nodemailer-juice');
 const {google} = require('googleapis');
 const ItemPedido = require('./item_pedido');
 const { dateToView } = require('../utils/comum');
 const Usuario = require('./usuario');
-const Pedido = require('./pedido');
 const clientId = process.env.oauth_client_id;
 const clientSecret = process.env.oauth_client_secret;
 const refreshToken = process.env.oauth_refresh_token;
@@ -39,6 +39,8 @@ class Mailer {
                 user: process.env.mailer_sender
             }
         });
+
+        this.transporter.use('compile', inLineCss());
     }
 
     sendEmail() {
@@ -85,11 +87,12 @@ class MensagemPedidoFinalizado {
         this.idPedido = this.pedido.idPedido;
         this.statusAtendimento = this.pedido.status;
         this.obsAtendimento = this.pedido.observacaoAtendimento;
-        this.dataPedido = dateToView(this.pedido.dataPedido);
-        this.dataAtendimento = dateToView(this.pedido.dataAtendimento);
+        this.dataPedido = dateToView(this.pedido.dtPedido);
+        this.dataAtendimento = dateToView(this.pedido.dtAtendimento);
         
         const itemPedido = new ItemPedido;
         this.objItensPedido = (await itemPedido.listarPorPedido(this.idPedido)).dados;
+        console.log(this.objItensPedido);
 
         const usuario = new Usuario;
         await usuario.carregarPorId(this.pedido.idUsuario);
@@ -100,18 +103,45 @@ class MensagemPedidoFinalizado {
     gerarHtml() {
         const tabelaItens = this.geraTabelaItens();
         const html = `
-        <h1>UMOX - Gestão de Almoxarifado</h1>
+        <style>
+            div {
+                background-color: #f1f0f6;
+            }
+        </style>
+        <h1 style="color: #1e65ae;">UMOX - Gestão de Almoxarifado</h1>
+        <div style="color: #707070">
         <p>Prezado(a) servidor(a)</p>
         <p>Seu pedido de material nº ${this.idPedido} foi finalizado pelo atendente com o status: <b>${this.statusAtendimento}</b></p>
         <h2>Detalhes do pedido</h2>
-        <p><b><span style="width: 60px;">Nº Pedido:</span></b><span>${this.idPedido}</span></p>
-        <p><b><span style="width: 60px;">Solicitante:</span></b><span>${this.nomeUsuario}</span></p>
-        <p><b><span style="width: 60px;">Data do pedido:</span></b><span>${this.dataPedido}</span></p>
-        <p><b><span style="width: 60px;">Data de Atendimento:</span></b><span>${this.dataAtendimento}</span></p>
-        <p><b><span style="width: 60px;">Status do Atendimento:</span></b><span>${this.statusAtendimento}</span></p>
-        <$><b><span style="width: 60px;">Despacho do Atendimento:</span></b>${this.obsAtendimento}</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Nº Pedido:</td>
+                    <td>${this.idPedido}</td>
+                </tr>
+                <tr>
+                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Data do pedido:</td>
+                    <td>${this.dataPedido}</td>
+                </tr>
+                <tr>
+                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Data do atendimento:</td>
+                    <td>${this.dataAtendimento}</td>
+                </tr>
+                <tr>
+                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Status do atendimento:</td>
+                    <td>${this.statusAtendimento}</td>
+                </tr>
+                <tr>
+                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Despacho do atendimento:</td>
+                    <td>${this.obsAtendimento}</td>
+                </tr>
+            </tbody>
+        </table>
         <h3>Relação de itens do pedido:</h3>
         ${tabelaItens}
+        </div>
+        </body>
+        </html>
         `
         return html;
     }
@@ -138,13 +168,13 @@ class MensagemPedidoFinalizado {
         const listaItens = this.geraListaItens();
         let html = 
         `<table>
-            <thead>
-                <tr>
-                    <th>ID ITEM</th>
-                    <th>DESCRIÇÃO</th>
-                    <th>MARCA</th>
-                    <th>QTD. SOLICITADA</th>
-                    <th>QTD. ATENDIDA</th>
+            <thead style="width: 100%;">
+                <tr style="background-color: #80a4dc; color: white;">
+                    <th style="text-align: left; width: 10%">ID ITEM</th>
+                    <th style="text-align: left; width: 50%">DESCRIÇÃO</th>
+                    <th style="text-align: left; width: 20%">MARCA</th>
+                    <th style="text-align: left; width: 10%">QTD. SOLICITADA</th>
+                    <th style="text-align: left; width: 10%">QTD. ATENDIDA</th>
                 </tr>
             </thead>
             <tbody>

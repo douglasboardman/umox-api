@@ -104,44 +104,40 @@ class MensagemPedidoFinalizado {
         const tabelaItens = this.geraTabelaItens();
         const html = `
         <style>
-            div {
-                background-color: #f1f0f6;
-            }
+            ${this.style()}
         </style>
-        <h1 style="color: #1e65ae;">UMOX - Gestão de Almoxarifado</h1>
-        <div style="color: #707070">
+        <div id="email-container">
+        <h1>UMOX - Gestão de Almoxarifado</h1>
+        <div id="div-corpo-email">
         <p>Prezado(a) servidor(a)</p>
         <p>Seu pedido de material nº ${this.idPedido} foi finalizado pelo atendente com o status: <b>${this.statusAtendimento}</b></p>
         <h2>Detalhes do pedido</h2>
-        <table>
+        <table id="tabela-detalhes-pedido">
             <tbody>
-                <tr>
-                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Nº Pedido:</td>
+                <tr id="tr-label-detalhe-pedido">
+                    <td>Nº Pedido:</td>
+                    <td>Data do pedido:</td>
+                    <td>Data do atendimento:</td>
+                    <td>Status do atendimento:</td>
+                </tr>
+                <tr id="tr-info-detalhe-pedido">
                     <td>${this.idPedido}</td>
-                </tr>
-                <tr>
-                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Data do pedido:</td>
                     <td>${this.dataPedido}</td>
-                </tr>
-                <tr>
-                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Data do atendimento:</td>
                     <td>${this.dataAtendimento}</td>
-                </tr>
-                <tr>
-                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Status do atendimento:</td>
                     <td>${this.statusAtendimento}</td>
                 </tr>
-                <tr>
-                    <td style="width: 220px; background-color: #f1f0f6; font-weight: 500;">Despacho do atendimento:</td>
-                    <td>${this.obsAtendimento}</td>
+                <tr id="tr-label-detalhe-pedido">
+                    <td colspan="4">Despacho do atendimento:</td>
+                </tr>
+                <tr id="tr-info-detalhe-pedido">
+                    <td colspan="4">${this.obsAtendimento}</td>
                 </tr>
             </tbody>
         </table>
-        <h3>Relação de itens do pedido:</h3>
+        <h2>Itens do pedido:</h2>
         ${tabelaItens}
         </div>
-        </body>
-        </html>
+        </div>
         `
         return html;
     }
@@ -167,9 +163,9 @@ class MensagemPedidoFinalizado {
     geraTabelaItens() {
         const listaItens = this.geraListaItens();
         let html = 
-        `<table>
-            <thead style="width: 100%;">
-                <tr style="background-color: #80a4dc; color: white;">
+        `<table id="tabela-itens-pedido">
+            <thead>
+                <tr>
                     <th style="text-align: left; width: 10%">ID ITEM</th>
                     <th style="text-align: left; width: 50%">DESCRIÇÃO</th>
                     <th style="text-align: left; width: 20%">MARCA</th>
@@ -183,6 +179,69 @@ class MensagemPedidoFinalizado {
         </table>`;
         
         return html;
+    }
+
+    style = () => {
+        return `
+        
+        * {
+            font-family: tahoma;
+        }
+    
+        h1 {
+            color: #1e65ae;
+        }
+    
+        h2 {
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+    
+        #div-corpo-email {
+            color:#707070;
+        }
+    
+        #tr-label-detalhe-pedido {
+            font-size: 10px;
+            font-weight: bold;
+        }
+    
+        #tr-info-detalhe-pedido {
+            font-size: 12px;
+            height: 50px;
+            vertical-align: top;
+        }
+    
+        #email-container {
+            width: 80%;
+        }
+    
+        #tabela-detalhes-pedido {
+            width: 100%;
+        }
+    
+        #tabela-detalhes-pedido td {
+            width: 25%;
+        }
+    
+        #tabela-itens-pedido {
+            width: 100%;
+            font-size: 10px;
+        }
+    
+        #tabela-itens-pedido td {
+            background-color: #f1f0f6;
+        }
+    
+        #tabela-itens-pedido thead tr {
+            background-color:#80a4dc;
+            color:white;
+        }
+    
+        #tabela-itens-pedido thead {
+            width:100%;
+        }
+        `
     }
 
 

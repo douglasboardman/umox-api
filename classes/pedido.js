@@ -137,10 +137,6 @@ class Pedido {
         }
     }
 
-    async atualizarItensAtendimento(objItens, idPedido) {
-        
-    }
-
     async gerarId() {
         const data = new Date();
         const ano = String(data.getFullYear());

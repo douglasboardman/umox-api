@@ -4,6 +4,7 @@ const autorizar = require('../middlewares/autorizador');
 const Pedido = require('../classes/pedido');
 const ItemPedido = require('../classes/item_pedido');
 const ResponseData = require('../classes/ResponseData');
+const { MensagemPedidoFinalizado, MensagemPedidoGerado } = require("../classes/mailer");
 
 // router de novo pedido
 
@@ -36,20 +37,27 @@ router.post('/novoPedido', autorizar, async (req, res)=> {
             const itemPedido = new ItemPedido;
         
             // lança itens do pedido no banco
-            itens.forEach(async item => {
+            const promises = itens.map(async item => {
                 await itemPedido.criarNovo(item.idItem, idPedido, item.qtdItem);
             });
+            
+            await Promise.all(promises);
+
+            // Envia mensagem de pedido criado
+            let message = new MensagemPedidoGerado(pedido);
+            await message.enviar();
+
             const response = new ResponseData(dadosUsuario, [], 'Pedido criado com sucesso!', false);
             
             return res.status(200).json(response);
         }
 
     } catch (erro) {
-        const response = new ResponseData();
-        response.error(true);
-        response.userInfo(dadosUsuario);
-        response.message('Erro ao criar novo pedido');
-        return res.status(500).send(response);
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
+        return res.status(401).send(response);
     }
 
 });
@@ -73,10 +81,10 @@ router.get('/meusPedidos', autorizar, async (req, res)=>{
             res.status(500).send(response);
         }
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
@@ -99,10 +107,10 @@ router.get('/consultarPedidos', autorizar, async (req, res)=>{
             res.status(500).send(response);
         }
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
@@ -125,10 +133,10 @@ router.get('/atendimento', autorizar, async (req, res)=>{
             res.status(500).send(response);
         }
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
@@ -152,10 +160,10 @@ router.get('/atenderPedido/:pid', autorizar, async (req, res)=>{
             res.status(500).send(response);
         }
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
@@ -180,23 +188,30 @@ router.post('/atenderPedido', autorizar, async (req, res)=>{
     
     if(permissoes.atender_pedidos) {
         let result = await pedido.finalizarPedido(idPedido, observacao, statusPedido, dataAtendimento, objItens);
-        console.log(result);
+        
+        // Envia mensagem de pedido finalizado
+        await pedido.carregarPorId(idPedido);
+        let message = new MensagemPedidoFinalizado(pedido);
+        await message.enviar();
+
         const response = new ResponseData(
             dadosUsuario,
             result.dados,
             result.msg,
             !result.status
-        )
+        );
+
         if(result.status) {
             return res.status(200).send(response);
         } else {
             return res.status(500).json(response);
         }
+
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 

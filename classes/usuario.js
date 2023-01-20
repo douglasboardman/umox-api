@@ -148,6 +148,24 @@ class Usuario {
             return {status: false, msg: 'Email inválido ou não informado', dados: []};
         }
     }
+
+    async listarPorPerfil(perfil) {
+        if (typeof perfil != 'undefined') {
+            
+            const db_return = await conn.query(
+                'SELECT * FROM usuarios WHERE perfil_usuario = $1',
+                [perfil]
+            );
+
+            if (typeof db_return.rows[0] != 'undefined') {
+                return {status: true, msg: `A consulta retornou ${db_return.rowCount} linhas`, dados: db_return.rows};
+            } else {
+                return {status: false, msg: `Não há usuários cadastrados com o perfil '${perfil}'`, dados: []};
+            }
+        } else {
+            return {status: false, msg: 'Perfil inválido ou não informado', dados: []};
+        }
+    }
     
     async listarPerfis () {
         const db_return = await conn.query('SELECT perfil FROM perfis');

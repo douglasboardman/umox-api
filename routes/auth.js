@@ -5,14 +5,9 @@ const validaInfo = require("../middlewares/validaInfo");
 const jwtGenerator = require("../utils/jwtGenerator");
 const autorizar = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
-const ClasseItem = require('../classes/item');
-const Item = new ClasseItem;
+const ResponseData = require('../classes/ResponseData');
 
 // router de login
-
-router.get('', (req, res)=>{
-    return res.render('login', {title: "Umox | Login"});
-});
 
 router.post('/login', validaInfo, async (req, res)=>{
     try{
@@ -89,6 +84,10 @@ router.post('/register', validaInfo, async (req, res)=>{
 
 });
 
+router.get('/permissoesUsuario', autorizar, async (req, res) => {
+    const permissoes = req.usuario.permissoes;
+    return res.status(200).send(permissoes);
+});
 
 // router para o dashboard
 router.get('/dashboard', autorizar, async (req, res)=>{

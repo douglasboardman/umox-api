@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const autorizar = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
-const { setBreadcrumbs } = require('../utils/comum');
 const ResponseData = require('../classes/ResponseData');
 
 
@@ -20,14 +19,13 @@ router.get('', autorizar, async (req, res) => {
         )
         return res.status(200).send(response);
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
-
 
 router.get('/editarUsuario/:uid', autorizar, async (req, res) => {
     const idUsuario = req.params.uid;
@@ -45,10 +43,10 @@ router.get('/editarUsuario/:uid', autorizar, async (req, res) => {
         )
         return res.status(200).send(response);
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 });
@@ -78,10 +76,10 @@ router.post('/editarUsuario', autorizar, async (req, res)=>{
             return res.status(500).send(response);
         }
     } else {
-        const response = new ResponseData;
-        response.userInfo(dadosUsuario);
-        response.error(true);
-        response.message('Usuário não possui permissões para realizar esta ação.')
+        const response = new ResponseData()
+        response.userInfo = dadosUsuario;
+        response.error = true;
+        response.message = 'Usuário não tem permissão para realizar esta ação.'
         return res.status(401).send(response);
     }
 

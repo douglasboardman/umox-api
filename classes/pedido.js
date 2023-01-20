@@ -1,7 +1,6 @@
 const conn = require("../dbConnPool");
 const { dateToBD, dateToView, Left } = require("../utils/comum");
 const ItemPedido = require("./item_pedido");
-const { MensagemPedidoFinalizado } = require("./mailer");
 
 class Pedido {
     constructor(idPedido, idUsuario, dtPedido, dtAtendimento, finalidade, status, observacaoAtendimento) {
@@ -122,10 +121,6 @@ class Pedido {
                         await item.atendimentoItemPedido(i.id_item, id_pedido, i.qtd_atendida);
                     });
                     await Promise.all(promises);
-                    const pedido = this;
-                    await pedido.carregarPorId(id_pedido);
-                    let message = new MensagemPedidoFinalizado(pedido);
-                    await message.enviar();
                 };
 
                 return {status: true, msg: 'Pedido finalizado com sucesso!', dados: []};

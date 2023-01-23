@@ -6,6 +6,7 @@ const jwtGenerator = require("../utils/jwtGenerator");
 const autorizar = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
 const ResponseData = require('../classes/ResponseData');
+const Dashboard = require('../classes/dashboard');
 
 // router de login
 
@@ -92,12 +93,11 @@ router.get('/permissoesUsuario', autorizar, async (req, res) => {
 // router para o dashboard
 router.get('/dashboard', autorizar, async (req, res)=>{
     if(req.usuario){
-        return res.status(200).json({
-            usuario: req.usuario.nome, 
-            tituloPagina: 'dashboard'
-        });
+        const dashboard = new Dashboard;
+        await dashboard.carregaMetricasStatusPedidos();
+        return res.status(200).send(dashboard.metricasStatusPedidos);
     } else {
-        return res.status(403).json({message: 'Acesso não permitido'});
+        return res.status(403).send({message: 'Acesso não permitido'});
     }
 });
 

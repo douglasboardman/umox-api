@@ -94,8 +94,8 @@ router.get('/permissoesUsuario', autorizar, async (req, res) => {
 router.get('/dashboard', autorizar, async (req, res)=>{
     if(req.usuario){
         const dashboard = new Dashboard;
-        await dashboard.carregaMetricasStatusPedidos();
-        return res.status(200).send(dashboard.metricasStatusPedidos);
+        const dadosDashboard = (await dashboard.listarDadosDashboard()).dados;
+        return res.status(200).send(dadosDashboard);
     } else {
         return res.status(403).send({message: 'Acesso não permitido'});
     }

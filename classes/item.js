@@ -190,7 +190,7 @@ class Item {
 async function criaIdItem(idNatureza) {
    try {
         const db_result = await conn.query(
-            'SELECT ultimo_registro FROM view_naturezas_itens WHERE id_natureza = $1',
+            'SELECT ultimo_registro FROM view_composicao_estoque WHERE id_natureza = $1',
             [idNatureza]
         );
         

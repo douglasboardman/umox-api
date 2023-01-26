@@ -90,6 +90,13 @@ router.get('/permissoesUsuario', autorizar, async (req, res) => {
     return res.status(200).send(permissoes);
 });
 
+router.get('/dadosUsuario', autorizar, async (req, res) => {
+    const usuario = new Usuario;
+    await usuario.carregarPorId(req.usuario.id);
+    const dadosUsuario = {id: req.usuario.id, nome: usuario.nome, email: usuario.email};
+    return res.status(200).send(dadosUsuario);
+});
+
 // router para o dashboard
 router.get('/dashboard', autorizar, async (req, res)=>{
     if(req.usuario){

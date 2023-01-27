@@ -99,7 +99,6 @@ router.get('/dadosUsuario', autorizar, async (req, res) => {
 
 router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
     // compila dados do usuário
-    console.log(req.body);
     const id = req.usuario.id;
     const nome = req.body.nome_usuario;
     const email = req.body.email_usuario;

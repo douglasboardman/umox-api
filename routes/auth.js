@@ -97,6 +97,32 @@ router.get('/dadosUsuario', autorizar, async (req, res) => {
     return res.status(200).send(dadosUsuario);
 });
 
+router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
+    // compila dados do usuário
+    console.log(req.body);
+    const id = req.usuario.id;
+    const nome = req.body.nome_usuario;
+    const email = req.body.email_usuario;
+    const dadosUsuario = {id: id, nome: nome, email: email};
+    const usuario = new Usuario;
+    await usuario.carregarPorId(id);
+    console.log(dadosUsuario);
+    const result = await usuario.atualizar(id, nome, email, usuario.perfil, usuario.acesso);
+    const response = new ResponseData(
+        dadosUsuario,
+        result.dados,
+        result.msg,
+        !result.status
+    )
+
+    if(result.status) {
+        return res.status(200).send(response);
+    } else {
+        return res.status(500).send(response);
+    }
+    
+})
+
 // router para o dashboard
 router.get('/dashboard', autorizar, async (req, res)=>{
     if(req.usuario){

@@ -62,13 +62,8 @@ router.post('/register', validaInfo, async (req, res)=>{
 
         if(! (await usuario.carregarPorEmail(email)).status){
     
-            // 3. encripta a senha informada para registro no banco
-            const saltRound = 10;
-            const salt = await bcrypt.genSalt(saltRound);
-            const bcryptSenha = await bcrypt.hash(senha, salt);
-    
             // 4. cadastra novo usuario
-            const result = await usuario.cadastrar(nome, email, bcryptSenha);
+            const result = await usuario.cadastrar(nome, email, senha);
             if(result.status) {
                 return res.status(200).json({message: result.msg});
             } else {
@@ -90,6 +85,14 @@ router.get('/permissoesUsuario', autorizar, async (req, res) => {
     return res.status(200).send(permissoes);
 });
 
+router.get('/confereSessao', autorizar, async (req, res) => {
+    if(typeof req.usuario != 'undefined') {
+        res.status(200).send({sessaoAtiva: true});
+    } else {
+        res.status(401).send({sessaoAtiva: false});
+    }
+})
+
 router.get('/dadosUsuario', autorizar, async (req, res) => {
     const usuario = new Usuario;
     await usuario.carregarPorId(req.usuario.id);
@@ -105,7 +108,6 @@ router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
     const dadosUsuario = {id: id, nome: nome, email: email};
     const usuario = new Usuario;
     await usuario.carregarPorId(id);
-    console.log(dadosUsuario);
     const result = await usuario.atualizar(id, nome, email, usuario.perfil, usuario.acesso);
     const response = new ResponseData(
         dadosUsuario,
@@ -119,6 +121,10 @@ router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
     } else {
         return res.status(500).send(response);
     }
+    
+});
+
+router.post('/alterarSenha', async (req, res) => {
     
 })
 

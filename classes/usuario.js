@@ -23,7 +23,7 @@ class Usuario {
         }
 
         try {
-            
+            senha = await criptografarSenha(senha);
             const db_return = await conn.query(
                 'INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario, perfil_usuario, acesso_permitido) VALUES ($1, $2, $3, $4, $5) RETURNING *',
                 [nome, email, senha, perfil, acesso]
@@ -171,6 +171,13 @@ class Usuario {
         const db_return = await conn.query('SELECT perfil FROM perfis');
         return {status: true, dados: db_return.rows}
     }
+}
+
+async function criptografarSenha(senha) {
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const bcryptSenha = await bcrypt.hash(senha, salt);
+    return bcryptSenha;
 }
 
 function emailValido(emailUsuario) {

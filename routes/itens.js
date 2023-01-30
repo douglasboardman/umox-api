@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const autorizar = require('../middlewares/autorizador');
+const { autorizarAcesso } = require('../middlewares/autorizador');
 const Item = require('../classes/item');
 const ResponseData = require('../classes/ResponseData');
 
 
 // GET renderiza página de consulta de itens
-router.get('/consultarEstoque', autorizar, async (req, res)=>{
+router.get('/consultarEstoque', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.consultar_estoque){
@@ -33,7 +33,7 @@ router.get('/consultarEstoque', autorizar, async (req, res)=>{
 });
 
 // GET renderiza página de consulta de itens
-router.get('/gerenciarEstoque', autorizar, async (req, res)=>{
+router.get('/gerenciarEstoque', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_estoque){
@@ -59,7 +59,7 @@ router.get('/gerenciarEstoque', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/listarNaturezas', autorizar, async (req, res)=>{
+router.get('/listarNaturezas', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_estoque){
@@ -86,7 +86,7 @@ router.get('/listarNaturezas', autorizar, async (req, res)=>{
     }
 });
 
-router.post('/cadastrarItem', autorizar, async (req, res) => {
+router.post('/cadastrarItem', autorizarAcesso, async (req, res) => {
     const permissoes = req.usuario.permissoes;
     if(permissoes.gerenciar_estoque) {
         const item = new Item;
@@ -103,7 +103,7 @@ router.post('/cadastrarItem', autorizar, async (req, res) => {
     }
 });
 
-router.get('/editarItem/:id', autorizar, async (req, res)=>{
+router.get('/editarItem/:id', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     const idItem = req.params.id;
@@ -133,7 +133,7 @@ router.get('/editarItem/:id', autorizar, async (req, res)=>{
     }
 });
 
-router.post('/editarItem', autorizar, async (req, res)=>{
+router.post('/editarItem', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     const {id_item, descricao_item, id_natureza, marca_item, un_medida_item, estoque_item} = req.body;

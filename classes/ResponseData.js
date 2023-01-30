@@ -6,35 +6,35 @@ class ResponseData {
     this._error = error;
   }
 
-  set userInfo(userInfo) {
+  setUserInfo(userInfo) {
     this._userInfo = userInfo;
   }
 
-  set data(data) {
+  setData(data) {
     this._data = data;
   }
 
-  set message(message) {
+  setMessage(message) {
     this._message = message;
   }
 
-  set error(error) {
+  setError(error) {
     this._error = error;
   }
 
-  get userInfo() {
+  getUserInfo() {
     return this._userInfo;
   }
 
-  get data() {
+  getData() {
     return this._data;
   }
 
-  get message() {
+  getMessage() {
     return this._message;
   }
 
-  get error() {
+  getError() {
     return this._error;
   }
 }

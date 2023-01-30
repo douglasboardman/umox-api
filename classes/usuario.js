@@ -171,6 +171,10 @@ class Usuario {
         const db_return = await conn.query('SELECT perfil FROM perfis');
         return {status: true, dados: db_return.rows}
     }
+
+    async criarRecuperacaoSenha() {
+        
+    }
 }
 
 async function criptografarSenha(senha) {

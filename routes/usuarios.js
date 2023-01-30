@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const autorizar = require('../middlewares/autorizador');
+const { autorizarAcesso } = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
 const ResponseData = require('../classes/ResponseData');
 
 
-router.get('', autorizar, async (req, res) => {
+router.get('', autorizarAcesso, async (req, res) => {
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if(permissoes.gerenciar_usuarios) {
@@ -27,7 +27,7 @@ router.get('', autorizar, async (req, res) => {
     }
 });
 
-router.get('/editarUsuario/:uid', autorizar, async (req, res) => {
+router.get('/editarUsuario/:uid', autorizarAcesso, async (req, res) => {
     const idUsuario = req.params.uid;
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
@@ -52,7 +52,7 @@ router.get('/editarUsuario/:uid', autorizar, async (req, res) => {
 });
 
 
-router.post('/editarUsuario', autorizar, async (req, res)=>{
+router.post('/editarUsuario', autorizarAcesso, async (req, res)=>{
     
     // coleta dados do usuário
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};

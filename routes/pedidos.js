@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const autorizar = require('../middlewares/autorizador');
+const { autorizarAcesso } = require('../middlewares/autorizador');
 const Pedido = require('../classes/pedido');
 const ItemPedido = require('../classes/item_pedido');
 const ResponseData = require('../classes/ResponseData');
@@ -8,7 +8,7 @@ const { MensagemPedidoFinalizado, MensagemPedidoGerado } = require("../classes/m
 
 // router de novo pedido
 
-router.post('/novoPedido', autorizar, async (req, res)=> {
+router.post('/novoPedido', autorizarAcesso, async (req, res)=> {
     
     // cria data de lançamento
     const dataPedido = new Date();
@@ -62,7 +62,7 @@ router.post('/novoPedido', autorizar, async (req, res)=> {
 
 });
 
-router.get('/meusPedidos', autorizar, async (req, res)=>{
+router.get('/meusPedidos', autorizarAcesso, async (req, res)=>{
     let permissoes = req.usuario.permissoes;                                                   
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
 
@@ -89,7 +89,7 @@ router.get('/meusPedidos', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/consultarPedidos', autorizar, async (req, res)=>{
+router.get('/consultarPedidos', autorizarAcesso, async (req, res)=>{
     let permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if (permissoes.fazer_pedidos) {
@@ -115,7 +115,7 @@ router.get('/consultarPedidos', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/atendimento', autorizar, async (req, res)=>{
+router.get('/atendimento', autorizarAcesso, async (req, res)=>{
     let permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     if (permissoes.atender_pedidos) {
@@ -141,7 +141,7 @@ router.get('/atendimento', autorizar, async (req, res)=>{
     }
 });
 
-router.get('/atenderPedido/:pid', autorizar, async (req, res)=>{
+router.get('/atenderPedido/:pid', autorizarAcesso, async (req, res)=>{
     let permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
     let idPedido = req.params.pid;
@@ -168,7 +168,7 @@ router.get('/atenderPedido/:pid', autorizar, async (req, res)=>{
     }
 });
 
-router.post('/atenderPedido', autorizar, async (req, res)=>{
+router.post('/atenderPedido', autorizarAcesso, async (req, res)=>{
 
     // coleta dados do usuário
     const permissoes = req.usuario.permissoes;

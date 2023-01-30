@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const validaInfo = require("../middlewares/validaInfo");
-const jwtGenerator = require("../utils/jwtGenerator");
-const autorizar = require('../middlewares/autorizador');
+const { gerarTokenSessao } = require("../utils/jwtGenerator");
+const { autorizarAcesso, autorizarAlteracaoSenha } = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
 const ResponseData = require('../classes/ResponseData');
 const Dashboard = require('../classes/dashboard');
@@ -39,7 +39,7 @@ router.post('/login', validaInfo, async (req, res)=>{
         const payload = {id: usuario.id, nome: usuario.nome, permissoes: usuario.permissoes};
 
         // 5. atribui token jwt
-        const token = jwtGenerator(usuario.id, usuario.nome, permissoes);
+        const token = gerarTokenSessao(usuario.id, usuario.nome, permissoes);
         
         //res.cookie('jwtToken', token, { maxAge: 1 * 60 * 60 * 1000, httpOnly: true });
         res.header('x-access-token', token);
@@ -80,12 +80,12 @@ router.post('/register', validaInfo, async (req, res)=>{
 
 });
 
-router.get('/permissoesUsuario', autorizar, async (req, res) => {
+router.get('/permissoesUsuario', autorizarAcesso, async (req, res) => {
     const permissoes = req.usuario.permissoes;
     return res.status(200).send(permissoes);
 });
 
-router.get('/confereSessao', autorizar, async (req, res) => {
+router.get('/confereSessao', autorizarAcesso, async (req, res) => {
     if(typeof req.usuario != 'undefined') {
         res.status(200).send({sessaoAtiva: true});
     } else {
@@ -93,14 +93,14 @@ router.get('/confereSessao', autorizar, async (req, res) => {
     }
 })
 
-router.get('/dadosUsuario', autorizar, async (req, res) => {
+router.get('/dadosUsuario', autorizarAcesso, async (req, res) => {
     const usuario = new Usuario;
     await usuario.carregarPorId(req.usuario.id);
     const dadosUsuario = {id: req.usuario.id, nome: usuario.nome, email: usuario.email};
     return res.status(200).send(dadosUsuario);
 });
 
-router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
+router.post('/alteraDadosUsuario', autorizarAcesso, async (req, res) => {
     // compila dados do usuário
     const id = req.usuario.id;
     const nome = req.body.nome_usuario;
@@ -124,12 +124,26 @@ router.post('/alteraDadosUsuario', autorizar, async (req, res) => {
     
 });
 
-router.post('/alterarSenha', async (req, res) => {
-    
-})
+router.post('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => {
+    const response = new ResponseData(req.usuario, [], '', false);
+    if(typeof req.usuario != 'undefined') {
+        response.setMessage('Token de alteração de senha válido!');
+        res.status(200).send(response);
+    } else {
+        response.setMessage('Token de alteração de senha inválido!');
+        response.setError(true);
+        res.status(401).send(response);
+    }
+});
+
+router.get('/gerarTokenAltSenha/:email', async (req, res) => {
+    const email = req.params.email;
+    const usuario = new Usuario;
+    await usuario.carregarPorEmail(email);
+});
 
 // router para o dashboard
-router.get('/dashboard', autorizar, async (req, res)=>{
+router.get('/dashboard', autorizarAcesso, async (req, res)=>{
     if(req.usuario){
         const dashboard = new Dashboard;
         const dadosDashboard = (await dashboard.listarDadosDashboard()).dados;

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-module.exports = async (req, res, next) => {
+async function autorizarAcesso (req, res, next) {
     try {
         const jwtToken = req.header('x-access-token');
 
@@ -19,3 +19,20 @@ module.exports = async (req, res, next) => {
     }
     next();
 };
+
+async function autorizarAlteracaoSenha (req, res, next) {
+    try {
+        const token = req.params.token;
+
+        const payload = jwt.verify(token, process.env.jwtSecret);
+
+        req.usuario = payload.usuario;
+
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({message: err.message});
+    }
+    next();
+}
+
+module.exports = { autorizarAcesso, autorizarAlteracaoSenha }

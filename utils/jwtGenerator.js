@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
-function jwtGenerator(id_usuario, nome_usuario, permissoes) {
+function gerarTokenSessao(id_usuario, nome_usuario, permissoes) {
     const payload = {
         usuario: {
             id: id_usuario,
@@ -13,4 +13,14 @@ function jwtGenerator(id_usuario, nome_usuario, permissoes) {
     return jwt.sign(payload, process.env.jwtSecret, {expiresIn: "1hr"});
 }
 
-module.exports = jwtGenerator;
+function gerarTokenRecuperacaoSenha(idUsuario) {
+    const payload = {
+        usuario: {
+            id: idUsuario
+        }
+    }
+
+    return jwt.sign(payload, process.env.jwtSecret, {expiresIn: "24hr"});
+}
+
+module.exports = { gerarTokenSessao, gerarTokenRecuperacaoSenha };

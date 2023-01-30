@@ -54,6 +54,82 @@ class Mailer {
     }
 }
 
+class MensagemRecuperacaoSenha {
+    
+    usuario;
+    nomeUsuario = '';
+    emailUsuario = '';
+    token = '';
+    
+    constructor(usuario, token) {
+        this.usuario = usuario;
+        this.token = token;
+    }
+
+    async enviar() {
+        await this.carregaDadosMensagem();
+        const html = this.gerarHtml();
+        const subject = `Pedido de Material nº ${this.idPedido}`;
+        const toEmail = this.emailUsuario;
+        const mailer = new Mailer(subject, toEmail, html);
+        try {
+            mailer.sendEmail();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async carregaDadosMensagem() {
+        this.nomeUsuario = usuario.nome;
+        this.emailUsuario = usuario.email;
+    }
+
+    gerarHtml() {
+        const url = `http://${process.env.app_ip}:${process.env.frontend_port}/alterarSenha/${this.token}`
+        let tmpArr = this.nomeUsuario.split(' ');
+        const nome = tmpArr[0];
+        const html = `
+        <style>
+            ${this.style()}
+        </style>
+        <div id="email-container">
+        <h1>UMOX - Gestão de Almoxarifado</h1>
+        <div id="div-corpo-email">
+        <p>Olá <b>${nome}</b>,</p>
+        <p><b>Esqueceu sua senha?</b> Sem problemas! Para criar uma nova senha, acesse o link clicando no botão abaixo:</p>
+        <a href="${url}" target="_blank">Criar nova senha</a>
+        <p id="disclaimer">Caso não tenha solicitado a alteração da senha, por favor, desconsidere esta mensagem e sua senha atual será mantida.</p>
+        </div>
+        </div>
+        `
+        return html;
+    }
+
+    style = () => {
+        return `
+            * {
+                font-family: tahoma;
+            }
+
+            h1 {
+                color: #1e65ae;
+            }
+
+            #div-corpo-email {
+                color: #707070;
+            }
+
+            #email-container {
+                width: 80%;
+            }
+
+            a {
+                
+            }
+        `
+    }
+}
+
 class MensagemPedidoFinalizado {
     
     pedido;
@@ -451,5 +527,7 @@ class MensagemPedidoGerado {
         `
     }
 }
+
+
 
 module.exports = {Mailer, MensagemPedidoFinalizado, MensagemPedidoGerado};

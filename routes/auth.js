@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const validaInfo = require("../middlewares/validaInfo");
-const { gerarTokenSessao } = require("../utils/jwtGenerator");
+const { gerarTokenSessao, gerarTokenRecuperacaoSenha } = require("../utils/jwtGenerator");
 const { autorizarAcesso, autorizarAlteracaoSenha } = require('../middlewares/autorizador');
 const Usuario = require('../classes/usuario');
 const ResponseData = require('../classes/ResponseData');
@@ -14,6 +14,7 @@ router.post('/login', validaInfo, async (req, res)=>{
     try{
         // 1. destructure das informações do formulário de login > req.body (email, senha)
         const {email, senha} = req.body;
+        console.log(req.body);
         // 2. confere se o usuário existe (se não existe dispara um erro)
         const usuario = new Usuario;
         const result = await usuario.carregarPorEmail(email);
@@ -124,7 +125,7 @@ router.post('/alteraDadosUsuario', autorizarAcesso, async (req, res) => {
     
 });
 
-router.post('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => {
+router.get('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => {
     const response = new ResponseData(req.usuario, [], '', false);
     if(typeof req.usuario != 'undefined') {
         response.setMessage('Token de alteração de senha válido!');
@@ -140,6 +141,8 @@ router.get('/gerarTokenAltSenha/:email', async (req, res) => {
     const email = req.params.email;
     const usuario = new Usuario;
     await usuario.carregarPorEmail(email);
+    const token = gerarTokenRecuperacaoSenha(usuario.id);
+    return res.status(200).send({token: token});
 });
 
 // router para o dashboard

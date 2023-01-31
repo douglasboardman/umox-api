@@ -69,7 +69,7 @@ class MensagemRecuperacaoSenha {
     async enviar() {
         await this.carregaDadosMensagem();
         const html = this.gerarHtml();
-        const subject = `Pedido de Material nº ${this.idPedido}`;
+        const subject = `Recuperação de senha`;
         const toEmail = this.emailUsuario;
         const mailer = new Mailer(subject, toEmail, html);
         try {
@@ -124,7 +124,9 @@ class MensagemRecuperacaoSenha {
             }
 
             a {
-                
+                background-color: #1e65ae;
+                color: #fff;
+                padding: 10px 25px;
             }
         `
     }
@@ -530,4 +532,4 @@ class MensagemPedidoGerado {
 
 
 
-module.exports = {Mailer, MensagemPedidoFinalizado, MensagemPedidoGerado};
+module.exports = {Mailer, MensagemPedidoFinalizado, MensagemPedidoGerado, MensagemRecuperacaoSenha};

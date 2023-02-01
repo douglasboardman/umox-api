@@ -125,6 +125,27 @@ router.post('/alteraDadosUsuario', autorizarAcesso, async (req, res) => {
     
 });
 
+router.patch('/alteraSenhaUsuario', autorizarAlteracaoSenha, async (req, res) => {
+    const usuario = new Usuario;
+    const id = req.usuario.id;
+    await usuario.carregarPorId(id);
+    console.log(usuario);
+    const result = await usuario.atualizarSenha(req.body.senha_usuario);
+    console.log(result);
+    const response = new ResponseData(
+        req.usuario,
+        result.dados,
+        result.msg,
+        !result.status
+    )
+
+    if(result.status) {
+        return res.status(200).send(response);
+    } else {
+        return res.status(500).send(response);
+    }
+});
+
 router.get('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => {
     const response = new ResponseData(req.usuario, [], '', false);
     if(typeof req.usuario != 'undefined') {

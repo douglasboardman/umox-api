@@ -74,6 +74,19 @@ class Usuario {
         }
     }
 
+    async atualizarSenha (novaSenha) {
+        try {
+            const senha = await criptografarSenha(novaSenha);
+            const db_return = await conn.query(
+                'UPDATE usuarios SET senha_usuario = $1 WHERE id_usuario = $2 RETURNING *',
+                [senha, this.id]
+            );
+            return {status: true, msg: 'Usuário atualizado com sucesso!', dados: db_return.rows[0]}
+        } catch (error) {
+            return {status: false, msg: error, dados: []}
+        }
+    }
+
     async listarPermissoes () {
         if (typeof this.id == 'undefined') {
             return {status: false, msg: 'Não é possível listar permissões de um usuário ainda não cadastrado'};

@@ -22,7 +22,13 @@ async function autorizarAcesso (req, res, next) {
 
 async function autorizarAlteracaoSenha (req, res, next) {
     try {
-        const token = req.params.token;
+        let token = '';
+        
+        if(req.params.token) {
+            token = req.params.token;
+        } else {
+            token = req.body.token;
+        }
 
         const payload = jwt.verify(token, process.env.jwtSecret);
 

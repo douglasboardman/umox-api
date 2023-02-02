@@ -20,6 +20,21 @@ async function autorizarAcesso (req, res, next) {
     next();
 };
 
+async function confereAccessToken (req, res, next) {
+    try {
+        const jwtToken = req.header('x-access-token');
+
+        if (jwtToken) {
+            const payload = jwt.verify(jwtToken, process.env.jwtSecret);
+            req.usuario = payload.usuario;
+        }
+
+    } catch (err) {
+        console.error(err.message);
+    }
+    next();
+}
+
 async function autorizarAlteracaoSenha (req, res, next) {
     try {
         let token = '';
@@ -31,7 +46,7 @@ async function autorizarAlteracaoSenha (req, res, next) {
         }
 
         const payload = jwt.verify(token, process.env.jwtSecret);
-
+        
         req.usuario = payload.usuario;
 
     } catch (err) {
@@ -41,4 +56,4 @@ async function autorizarAlteracaoSenha (req, res, next) {
     next();
 }
 
-module.exports = { autorizarAcesso, autorizarAlteracaoSenha }
+module.exports = { autorizarAcesso, autorizarAlteracaoSenha, confereAccessToken }

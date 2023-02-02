@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const validaInfo = require("../middlewares/validaInfo");
 const { gerarTokenSessao, gerarTokenRecuperacaoSenha } = require("../utils/jwtGenerator");
-const { autorizarAcesso, autorizarAlteracaoSenha } = require('../middlewares/autorizador');
+const { autorizarAcesso, autorizarAlteracaoSenha, confereAccessToken } = require('../middlewares/autorizador');
+const { MensagemRecuperacaoSenha } = require("../classes/mailer");
 const Usuario = require('../classes/usuario');
 const ResponseData = require('../classes/ResponseData');
 const Dashboard = require('../classes/dashboard');
@@ -86,11 +87,11 @@ router.get('/permissoesUsuario', autorizarAcesso, async (req, res) => {
     return res.status(200).send(permissoes);
 });
 
-router.get('/confereSessao', autorizarAcesso, async (req, res) => {
+router.get('/confereSessao', confereAccessToken, async (req, res) => {
     if(typeof req.usuario != 'undefined') {
         res.status(200).send({sessaoAtiva: true});
     } else {
-        res.status(401).send({sessaoAtiva: false});
+        res.status(200).send({sessaoAtiva: false});
     }
 })
 
@@ -150,6 +151,7 @@ router.get('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => 
     const response = new ResponseData(req.usuario, [], '', false);
     if(typeof req.usuario != 'undefined') {
         response.setMessage('Token de alteração de senha válido!');
+        //console.log(response);
         res.status(200).send(response);
     } else {
         response.setMessage('Token de alteração de senha inválido!');
@@ -164,6 +166,22 @@ router.get('/gerarTokenAltSenha/:email', async (req, res) => {
     await usuario.carregarPorEmail(email);
     const token = gerarTokenRecuperacaoSenha(usuario.id);
     return res.status(200).send({token: token});
+});
+
+router.get('/recuperarSenha/:email', async (req,res) => {
+    const email = req.params.email;
+    const usuario = new Usuario;
+    await usuario.carregarPorEmail(email);
+    const token = gerarTokenRecuperacaoSenha(usuario.id);
+    try {
+        let msg = new MensagemRecuperacaoSenha(usuario, token);
+        await msg.enviar();
+        const response = new ResponseData([], [], 'Email enviado com sucesso!', false);
+        res.status(200).send(response);
+    } catch (error) {
+        const response = new ResponseData([], [], error, true);
+        res.status(500).send(response);
+    }
 });
 
 // router para o dashboard

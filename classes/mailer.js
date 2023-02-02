@@ -15,6 +15,81 @@ const accessToken = async () => {
     return await oAuth2Client.getAccessToken();
 }
 
+const style = `
+* {
+    font-family: tahoma;
+}
+
+h1 {
+    color: #1e65ae;
+}
+
+h2 {
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+a.button {
+    background-color: #1e65ae;
+    color: #fff;
+    padding: 10px 25px;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+p.disclaimer {
+    color: #505050;
+    font-size: 10px;
+}
+
+#div-corpo-email {
+    color:#707070;
+}
+
+#tr-label-detalhe-pedido {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#tr-info-detalhe-pedido {
+    font-size: 12px;
+    vertical-align: top;
+    height: 40px;
+}
+
+#email-container {
+    width: 80%;
+}
+
+#tabela-detalhes-pedido {
+    width: 100%;
+}
+
+#tabela-detalhes-pedido td {
+    width: 25%;
+    padding: 0 5px;
+}
+
+#tabela-itens-pedido {
+    width: 100%;
+    font-size: 10px;
+}
+
+#tabela-itens-pedido td {
+    background-color: #f1f0f6;
+}
+
+#tabela-itens-pedido thead tr {
+    background-color:#80a4dc;
+    color:white;
+}
+
+#tabela-itens-pedido thead {
+    width:100%;
+}
+
+`;
+
 class Mailer {
     constructor(subject, toEmail, html) {
         this.subject = subject;
@@ -57,8 +132,6 @@ class Mailer {
 class MensagemRecuperacaoSenha {
     
     usuario;
-    nomeUsuario = '';
-    emailUsuario = '';
     token = '';
     
     constructor(usuario, token) {
@@ -67,10 +140,9 @@ class MensagemRecuperacaoSenha {
     }
 
     async enviar() {
-        await this.carregaDadosMensagem();
         const html = this.gerarHtml();
         const subject = `Recuperação de senha`;
-        const toEmail = this.emailUsuario;
+        const toEmail = this.usuario.email;
         const mailer = new Mailer(subject, toEmail, html);
         try {
             mailer.sendEmail();
@@ -79,25 +151,20 @@ class MensagemRecuperacaoSenha {
         }
     }
 
-    async carregaDadosMensagem() {
-        this.nomeUsuario = usuario.nome;
-        this.emailUsuario = usuario.email;
-    }
-
     gerarHtml() {
         const url = `http://${process.env.app_ip}:${process.env.frontend_port}/alterarSenha/${this.token}`
-        let tmpArr = this.nomeUsuario.split(' ');
+        let tmpArr = this.usuario.nome.split(' ');
         const nome = tmpArr[0];
         const html = `
         <style>
-            ${this.style()}
+            ${style}
         </style>
         <div id="email-container">
         <h1>UMOX - Gestão de Almoxarifado</h1>
         <div id="div-corpo-email">
         <p>Olá <b>${nome}</b>,</p>
         <p><b>Esqueceu sua senha?</b> Sem problemas! Para criar uma nova senha, acesse o link clicando no botão abaixo:</p>
-        <a href="${url}" target="_blank">Criar nova senha</a>
+        <a class="button" href="${url}" target="_blank">Criar nova senha</a>
         <p id="disclaimer">Caso não tenha solicitado a alteração da senha, por favor, desconsidere esta mensagem e sua senha atual será mantida.</p>
         </div>
         </div>
@@ -105,31 +172,6 @@ class MensagemRecuperacaoSenha {
         return html;
     }
 
-    style = () => {
-        return `
-            * {
-                font-family: tahoma;
-            }
-
-            h1 {
-                color: #1e65ae;
-            }
-
-            #div-corpo-email {
-                color: #707070;
-            }
-
-            #email-container {
-                width: 80%;
-            }
-
-            a {
-                background-color: #1e65ae;
-                color: #fff;
-                padding: 10px 25px;
-            }
-        `
-    }
 }
 
 class MensagemPedidoFinalizado {
@@ -182,7 +224,7 @@ class MensagemPedidoFinalizado {
         const tabelaItens = this.geraTabelaItens();
         const html = `
         <style>
-            ${this.style()}
+            ${style}
         </style>
         <div id="email-container">
         <h1>UMOX - Gestão de Almoxarifado</h1>
@@ -257,69 +299,6 @@ class MensagemPedidoFinalizado {
         </table>`;
         
         return html;
-    }
-
-    style = () => {
-        return `
-            * {
-                font-family: tahoma;
-            }
-
-            h1 {
-                color: #1e65ae;
-            }
-
-            h2 {
-                margin-bottom: 10px;
-                margin-top: 20px;
-            }
-
-            #div-corpo-email {
-                color:#707070;
-            }
-
-            #tr-label-detalhe-pedido {
-                font-size: 10px;
-                font-weight: bold;
-            }
-
-            #tr-info-detalhe-pedido {
-                font-size: 12px;
-                vertical-align: top;
-                height: 40px;
-            }
-
-            #email-container {
-                width: 80%;
-            }
-
-            #tabela-detalhes-pedido {
-                width: 100%;
-            }
-
-            #tabela-detalhes-pedido td {
-                width: 25%;
-                padding: 0 5px;
-            }
-
-            #tabela-itens-pedido {
-                width: 100%;
-                font-size: 10px;
-            }
-
-            #tabela-itens-pedido td {
-                background-color: #f1f0f6;
-            }
-
-            #tabela-itens-pedido thead tr {
-                background-color:#80a4dc;
-                color:white;
-            }
-
-            #tabela-itens-pedido thead {
-                width:100%;
-            }
-        `
     }
 }
 
@@ -396,7 +375,7 @@ class MensagemPedidoGerado {
         const tabelaItens = this.geraTabelaItens();
         const html = `
         <style>
-            ${this.style()}
+            ${style}
         </style>
         <div id="email-container">
         <h1>UMOX - Gestão de Almoxarifado</h1>
@@ -464,69 +443,6 @@ class MensagemPedidoGerado {
         </table>`;
         
         return html;
-    }
-
-    style = () => {
-        return `
-        
-        * {
-            font-family: tahoma;
-        }
-    
-        h1 {
-            color: #1e65ae;
-        }
-    
-        h2 {
-            margin-bottom: 10px;
-            margin-top: 20px;
-        }
-    
-        #div-corpo-email {
-            color:#707070;
-        }
-    
-        #tr-label-detalhe-pedido {
-            font-size: 10px;
-            font-weight: bold;
-        }
-    
-        #tr-info-detalhe-pedido {
-            font-size: 12px;
-            vertical-align: top;
-        }
-    
-        #email-container {
-            width: 80%;
-        }
-    
-        #tabela-detalhes-pedido {
-            width: 100%;
-        }
-    
-        #tabela-detalhes-pedido td {
-            width: 25%;
-            padding: 0 5px;
-        }
-    
-        #tabela-itens-pedido {
-            width: 100%;
-            font-size: 10px;
-        }
-    
-        #tabela-itens-pedido td {
-            background-color: #f1f0f6;
-        }
-    
-        #tabela-itens-pedido thead tr {
-            background-color:#80a4dc;
-            color:white;
-        }
-    
-        #tabela-itens-pedido thead {
-            width:100%;
-        }
-        `
     }
 }
 

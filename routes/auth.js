@@ -20,19 +20,19 @@ router.post('/login', validaInfo, async (req, res)=>{
         const result = await usuario.carregarPorEmail(email);
         
         if(!result.status) {
-            return res.status(401).json({message: "Usuário ou senha incorretos"});
+            return res.status(401).send({message: "Usuário ou senha incorretos"});
         }
         // 3. checa se a senha informada é a mesma registrada no banco
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
         if(!senhaValida){
-            return res.status(401).json({message: "Usuário ou senha incorretos"});
+            return res.status(401).send({message: "Usuário ou senha incorretos"});
         }
         // 4. consulta autorização de acesso e permissões do usuario
         const acessoPermitido = usuario.acesso;
 
         if (!acessoPermitido){
-            return res.status(403).json({message: 'Usuário não possui permissão para acessar o sistema'});
+            return res.status(403).send({message: 'Usuário não possui permissão para acessar o sistema'});
         }
 
         // carrega payload

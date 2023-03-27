@@ -24,6 +24,11 @@ h1 {
     color: #1e65ae;
 }
 
+#titulo-msg-rec-senha {
+    color: #1e65ae;
+    text-align: center;
+}
+
 h2 {
     margin-bottom: 10px;
     margin-top: 20px;
@@ -37,12 +42,26 @@ a.button {
     border-radius: 3px;
 }
 
-p.disclaimer {
+p {
+    margin-bottom: 25px;
+}
+
+#disclaimer {
+    margin-top: 25px;
     color: #505050;
-    font-size: 10px;
 }
 
 #div-corpo-email {
+    color:#707070;
+}
+
+#div-corpo-email-rec-senha {
+    background-color: #ececec;
+    margin: 50px auto 50px auto;
+    padding: 30px;
+    max-width: 400px;
+    border-radius: 5px;
+    border: 1px solid rgb(80, 80, 80);
     color:#707070;
 }
 
@@ -160,8 +179,8 @@ class MensagemRecuperacaoSenha {
             ${style}
         </style>
         <div id="email-container">
-        <h1>UMOX - Gestão de Almoxarifado</h1>
-        <div id="div-corpo-email">
+        <h1 id="titulo-msg-rec-senha">UMOX - Gestão de Almoxarifado</h1>
+        <div id="div-corpo-email-rec-senha">
         <p>Olá <b>${nome}</b>,</p>
         <p><b>Esqueceu sua senha?</b> Sem problemas! Para criar uma nova senha, acesse o link clicando no botão abaixo:</p>
         <a class="button" href="${url}" target="_blank">Criar nova senha</a>

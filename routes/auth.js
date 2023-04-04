@@ -15,7 +15,6 @@ router.post('/login', validaInfo, async (req, res)=>{
     try{
         // 1. destructure das informações do formulário de login > req.body (email, senha)
         const {email, senha} = req.body;
-        console.log(req.body);
         // 2. confere se o usuário existe (se não existe dispara um erro)
         const usuario = new Usuario;
         const result = await usuario.carregarPorEmail(email);

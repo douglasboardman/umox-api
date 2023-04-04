@@ -7,7 +7,7 @@ const pedidos = require('./routes/pedidos');
 const itens = require('./routes/itens');
 const usuarios = require('./routes/usuarios');
 
-const backendPort = process.env.backend_port || 3000;
+const backendPort = process.env.backend_port || 3001;
 const frontendPort = process.env.frontend_port;
 const appIP = process.env.app_ip;
 app.use(bodyParser.json());
@@ -36,4 +36,4 @@ app.use('/admin/pedidos', pedidos);
 app.use('/admin/itens', itens);
 app.use('/admin/usuarios', usuarios);
 
-app.listen(backendPort, ()=>{console.log(`Listening to the server on http://192.168.10.100:${backendPort}`)});
+app.listen(backendPort, ()=>{console.log(`Listening to the server on http://192.168.10.20:${backendPort}`)});

@@ -75,11 +75,9 @@ router.get('/meusPedidos', autorizarAcesso, async (req, res)=>{
             result.msg,
             !result.status
         )
-        if(result.status) {
-            res.status(200).send(response);
-        } else {
-            res.status(500).send(response);
-        }
+        
+        res.status(200).send(response);
+        
     } else {
         const response = new ResponseData()
         response.userInfo = dadosUsuario;

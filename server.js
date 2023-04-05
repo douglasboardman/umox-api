@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
 
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", `http://${appIP}:${frontendPort}`); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", '*'); // res.header("Access-Control-Allow-Origin", `http://${appIP}:${frontend_port}`); <== Versão de desenvolvimento
     res.header("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
 

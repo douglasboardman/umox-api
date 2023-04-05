@@ -171,7 +171,7 @@ class MensagemRecuperacaoSenha {
     }
 
     gerarHtml() {
-        const url = `http://${process.env.app_ip}:${process.env.frontend_port}/alterarSenha/${this.token}`
+        const url = `http://${String(process.env.app_ip)}:${process.env.frontend_port}/alterarSenha/${this.token}`
         let tmpArr = this.usuario.nome.split(' ');
         const nome = tmpArr[0];
         const html = `

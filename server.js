@@ -8,7 +8,7 @@ const itens = require('./routes/itens');
 const usuarios = require('./routes/usuarios');
 
 const backendPort = process.env.backend_port || 3002;
-const frontendPort = process.env.frontend_port;
+//const frontendPort = process.env.frontend_port;
 const appIP = process.env.app_ip;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -36,4 +36,4 @@ app.use('/admin/pedidos', pedidos);
 app.use('/admin/itens', itens);
 app.use('/admin/usuarios', usuarios);
 
-app.listen(backendPort, ()=>{console.log(`Listening to the server on http://localhost:${backendPort}`)});
+app.listen(backendPort, ()=>{console.log(`Listening to the server on http://${appIP}:${backendPort}`)});

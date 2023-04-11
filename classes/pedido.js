@@ -64,8 +64,7 @@ class Pedido {
                 'SELECT * FROM view_itens_pedido WHERE id_usuario = $1',
                 [idUsuario]
             );
-
-            console.log(db_result.rows[0]);    
+  
             if (typeof db_result.rows[0] != 'undefined') {
                 const dados = this.#reduzirLista(db_result.rows);
                 return {status: true, msg: `A consulta retornou ${dados.length} linhas`, dados: dados};

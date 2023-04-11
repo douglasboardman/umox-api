@@ -84,8 +84,6 @@ class Item {
                 'INSERT INTO itens (id_item, descricao_item, id_natureza, marca_item, un_medida_item, estoque_item) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
                 [id, descricao, idNatureza, marca, unMedida, estoque]
             );
-            
-            console.log(db_result);
 
             if (typeof db_result != 'undefined') {
                 let res = await conn.query('SELECT natureza FROM naturezas WHERE id_natureza = $1', [db_result.rows[0].id_natureza]);
@@ -113,7 +111,6 @@ class Item {
 
     async atualizarRegistro(id, descricao, idNatureza, marca, unMedida, estoque) {
         // confere alteração da natureza
-        
         try {
             if (Left(String(id), 4) == idNatureza) {
             
@@ -136,13 +133,13 @@ class Item {
                 }
                 
             } else {
-                let novaId = criaIdItem(idNatureza);
-    
+                let novaId = await criaIdItem(idNatureza);
+
                 const db_result = await conn.query(
-                    'UPDATE itens SET id_item = 1$, descricao_item = $2, id_natureza = $3, marca_item = $4, un_medida_item = $5, estoque_item = $6 RETURNING *',
-                    [novaId, descricao, idNatureza, marca, unMedida, estoque]
+                    'UPDATE itens SET id_item = $1, descricao_item = $2, id_natureza = $3, marca_item = $4, un_medida_item = $5, estoque_item = $6 WHERE id_item = $7 RETURNING *',
+                    [novaId, descricao, idNatureza, marca, unMedida, estoque, id]
                 );
-                    
+
                 if (typeof db_result.rows[0] != 'undefined') {
                     let res = await conn.query('SELECT natureza FROM naturezas WHERE id_natureza = $1', [idNatureza]);
                     this.id = novaId;
@@ -158,7 +155,6 @@ class Item {
             }
         } catch (erro) {
             let msg = '';
-            
             if(String(erro).search('duplicate key')){
                 msg = 'Já existe um registro com descrição e marca idênticos';
             } else {

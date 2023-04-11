@@ -231,7 +231,6 @@ class MensagemPedidoFinalizado {
         
         const itemPedido = new ItemPedido;
         this.objItensPedido = (await itemPedido.listarPorPedido(this.idPedido)).dados;
-        console.log(this.objItensPedido);
 
         const usuario = new Usuario;
         await usuario.carregarPorId(this.pedido.idUsuario);
@@ -381,7 +380,6 @@ class MensagemPedidoGerado {
         
         const itemPedido = new ItemPedido;
         this.objItensPedido = (await itemPedido.listarPorPedido(this.idPedido)).dados;
-        console.log(this.objItensPedido);
 
         const usuario = new Usuario;
         await usuario.carregarPorId(this.pedido.idUsuario);

@@ -129,9 +129,8 @@ router.patch('/alteraSenhaUsuario', autorizarAlteracaoSenha, async (req, res) =>
     const usuario = new Usuario;
     const id = req.usuario.id;
     await usuario.carregarPorId(id);
-    console.log(usuario);
     const result = await usuario.atualizarSenha(req.body.senha_usuario);
-    console.log(result);
+    
     const response = new ResponseData(
         req.usuario,
         result.dados,
@@ -150,7 +149,6 @@ router.get('/alterarSenha/:token', autorizarAlteracaoSenha, async (req, res) => 
     const response = new ResponseData(req.usuario, [], '', false);
     if(typeof req.usuario != 'undefined') {
         response.setMessage('Token de alteração de senha válido!');
-        //console.log(response);
         res.status(200).send(response);
     } else {
         response.setMessage('Token de alteração de senha inválido!');

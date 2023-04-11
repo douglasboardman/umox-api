@@ -95,7 +95,6 @@ router.post('/cadastrarItem', autorizarAcesso, async (req, res) => {
         if(result.status) {
             return res.status(200).json(result);
         } else {
-            console.log(result);
             return res.status(500).json(result);
         }
     } else {
@@ -117,7 +116,7 @@ router.get('/editarItem/:id', autorizarAcesso, async (req, res)=>{
             result.msg,
             !result.status
         )
-        console.log(response);
+
         if(result.status) {
             return res.status(200).send(response);
         } else {
@@ -140,7 +139,6 @@ router.post('/editarItem', autorizarAcesso, async (req, res)=>{
     if(permissoes.gerenciar_estoque){
         const item = new Item;
         const result = (await item.atualizarRegistro(id_item, descricao_item, id_natureza, marca_item, un_medida_item, estoque_item));
-        console.log(result);
         const response = new ResponseData(
             dadosUsuario,
             result.dados,
@@ -150,7 +148,6 @@ router.post('/editarItem', autorizarAcesso, async (req, res)=>{
         if(result.status) {
             return res.status(200).send(response);
         } else {
-            console.log(result);
             return res.status(500).send(response);
         }
     } else {

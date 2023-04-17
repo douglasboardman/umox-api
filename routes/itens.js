@@ -62,7 +62,7 @@ router.get('/gerenciarEstoque', autorizarAcesso, async (req, res)=>{
 router.get('/listarNaturezas', autorizarAcesso, async (req, res)=>{
     const permissoes = req.usuario.permissoes;
     const dadosUsuario = {nome: req.usuario.nome, id: req.usuario.id};
-    if(permissoes.gerenciar_estoque){
+    if(permissoes.consultar_estoque){
         const item = new Item;
         const result = await item.listarNaturezas();
         const response = new ResponseData(

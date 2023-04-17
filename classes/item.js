@@ -57,7 +57,7 @@ class Item {
 
     async listarNaturezas() {
         try {
-            const db_result = await conn.query('SELECT * FROM naturezas');
+            const db_result = await conn.query('SELECT * FROM naturezas ORDER BY naturezas ASC');
             return {status: true, msg: `A consulta retornou ${db_result.rowCount} linhas`, dados: db_result.rows}
         } catch (erro) {
             console.log(erro);
